@@ -111,7 +111,7 @@ sudo mv _nodepool.yaml /etc/nodepool/nodepool.yaml
 sudo mkdir -p /var/run/nodepool/
 sudo mkdir -p /var/log/nodepool/
 
-sudo tee /etc/nodepool.conf << NODEPOOLSTARTER
+sudo tee /etc/init/nodepool.conf << NODEPOOLSTARTER
 start on runlevel [2345]
 stop on runlevel [016]
 
