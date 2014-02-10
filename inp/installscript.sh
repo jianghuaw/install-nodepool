@@ -132,4 +132,4 @@ sudo mv -f _rc.local /etc/rc.local
 
 #####
 # Start now
-sudo /usr/bin/python /usr/local/bin/nodepoold -c /etc/nodepool/nodepool.yaml -l /home/ubuntu/src/config/modules/nodepool/files/logging.conf
+sudo nohup /usr/bin/python /usr/local/bin/nodepoold -c /etc/nodepool/nodepool.yaml -l /home/ubuntu/src/config/modules/nodepool/files/logging.conf &
