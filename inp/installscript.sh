@@ -111,25 +111,17 @@ sudo mv _nodepool.yaml /etc/nodepool/nodepool.yaml
 sudo mkdir -p /var/run/nodepool/
 sudo mkdir -p /var/log/nodepool/
 
-cat > _rc.local << RCLOCAL
-#!/bin/sh -e
-#
-# rc.local
-#
-# This script is executed at the end of each multiuser runlevel.
-# Make sure that the script will "exit 0" on success or any other
-# value on error.
-#
-# In order to enable or disable this script just change the execution
-# bits.
-#
-# By default this script does nothing.
-/usr/bin/python /usr/local/bin/nodepoold -c /etc/nodepool/nodepool.yaml -l /home/ubuntu/src/config/modules/nodepool/files/logging.conf
+sudo tee /etc/nodepool.conf << NODEPOOLSTARTER
+start on runlevel [2345]
+stop on runlevel [016]
 
-exit 0
-RCLOCAL
-sudo mv -f _rc.local /etc/rc.local
+chdir /
+
+script
+    /usr/bin/python /usr/local/bin/nodepoold -c /etc/nodepool/nodepool.yaml -l /home/ubuntu/src/config/modules/nodepool/files/logging.conf
+end script
+NODEPOOLSTARTER
 
 #####
 # Start now
-sudo nohup /usr/bin/python /usr/local/bin/nodepoold -c /etc/nodepool/nodepool.yaml -l /home/ubuntu/src/config/modules/nodepool/files/logging.conf &
+sudo service nodepool start
