@@ -15,6 +15,7 @@ def parse_install_args():
     parser.add_argument('host', help='Target host')
     parser.add_argument('rsparams', help='Rackspace settings file')
     parser.add_argument('rspass', help='Rackspace password')
+    parser.add_argument('--image_name', default='devstack-xenserver', help='Image name to use')
     return parser.parse_args()
 
 
@@ -46,6 +47,7 @@ def install():
     args = get_args_or_die(parse_install_args, issues_for_install_args)
     cloud_env = get_params_or_die(args.rsparams)
     cloud_env['RACKSPACE_PASSWORD'] = args.rspass
+    cloud_env['IMAGE_NAME'] = args.image_name
     nodepool_config_file = data.nodepool_config(cloud_env)
 
     with remote.connect(args.username, args.host) as connection:

@@ -24,7 +24,7 @@ providers:
     max-servers: 2
     keypair: nodepool
     images:
-      - name: devstack-xenserver-mate
+      - name: '$IMAGE_NAME'
         base-image: '62df001e-87ee-407c-b042-6f4e13f5d7e1'
         min-ram: 8192
         name-filter: 'Performance'
