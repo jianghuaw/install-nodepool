@@ -45,7 +45,7 @@ targets:
       user: fake
       apikey: fake
     images:
-      - name: devstack-xenserver
+      - name: '$IMAGE_NAME'
         min-ready: 1
         providers:
           - name: rax-iad
