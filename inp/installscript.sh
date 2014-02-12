@@ -1,6 +1,7 @@
 set -eux
 
-RACKSPACE_PASSWORD="$1"
+NODEPOOL_REPO="$1"
+NODEPOOL_BRANCH="$2"
 
 ######
 # Update apt
@@ -22,7 +23,8 @@ pushd config
 popd
 
 #git clone git@github.com:citrix-openstack/nodepool.git
-git clone https://github.com/citrix-openstack/nodepool.git
+git clone "$NODEPOOL_REPO"
+( cd nodepool && git checkout "$NODEPOOL_BRANCH" )
 pushd nodepool
 popd
 
