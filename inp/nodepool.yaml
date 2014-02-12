@@ -35,6 +35,7 @@ providers:
         launch_poll_interval: 10
         launch_poll_count: 40
         launch_done_stamp: /var/run/xenserver.ready
+        setup: 'prepare_node_devstack.sh'
         username: 'root'
         private-key: /home/ubuntu/.ssh/nodepool
 
