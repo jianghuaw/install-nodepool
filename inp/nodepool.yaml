@@ -28,7 +28,7 @@ providers:
         base-image: '62df001e-87ee-407c-b042-6f4e13f5d7e1'
         min-ram: 8192
         name-filter: 'Performance'
-        install: install_xenserver.sh
+        install: 'install_xenserver.sh'
         install_poll_interval: 10
         install_poll_count: 80
         install_status_file: /var/run/xenserver.ready
