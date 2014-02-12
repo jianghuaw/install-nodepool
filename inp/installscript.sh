@@ -64,7 +64,7 @@ stop on runlevel [016]
 chdir /
 
 script
-    export NODEPOOL_SSH_KEY=$(cat /home/ubuntu/.ssh/nodepool.pub)
+    export NODEPOOL_SSH_KEY="\$(cat /home/ubuntu/.ssh/nodepool.pub)"
     /usr/bin/python /usr/local/bin/nodepoold -c /etc/nodepool/nodepool.yaml -l /home/ubuntu/src/config/modules/nodepool/files/logging.conf
 end script
 NODEPOOLSTARTER
