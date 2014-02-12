@@ -32,9 +32,9 @@ providers:
         install-poll-interval: 10
         install-poll-count: 80
         install-done-stamp: /var/run/xenserver.ready
-        launch_poll_interval: 10
-        launch_poll_count: 40
-        launch_done_stamp: /var/run/xenserver.ready
+        launch-poll-interval: 10
+        launch-poll-count: 40
+        launch-done-stamp: /var/run/xenserver.ready
         setup: 'prepare_node_devstack.sh'
         username: 'jenkins'
         private-key: /home/ubuntu/.ssh/nodepool
