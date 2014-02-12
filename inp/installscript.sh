@@ -71,6 +71,12 @@ script
 end script
 NODEPOOLSTARTER
 
+# As nodepool will be executed as root, we need to give the ssh key to root
+sudo mkdir /root/.ssh
+sudo cp /home/ubuntu/.ssh/nodepool /root/.ssh/id_rsa
+sudo chmod 0400 /root/.ssh/id_rsa
+sudo chmod 0500 /root/.ssh
+
 #####
 # Start now
 sudo service nodepool start
