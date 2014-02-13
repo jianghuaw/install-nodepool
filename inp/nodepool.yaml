@@ -35,7 +35,8 @@ providers:
         launch-poll-interval: 10
         launch-poll-count: 40
         launch-done-stamp: /var/run/xenserver.ready
-        setup: 'prepare_node_devstack.sh'
+        pre-snapshot-timeout: 120
+        setup: 'prepare_node_xenserver.sh'
         username: 'jenkins'
         private-key: /home/ubuntu/.ssh/nodepool
 
