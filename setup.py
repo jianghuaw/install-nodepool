@@ -13,6 +13,7 @@ setup(
     entry_points = {
         'console_scripts': [
             'inp-install = inp.scripts:install',
+            'inp-start = inp.scripts:start',
         ]
     }
 )

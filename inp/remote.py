@@ -42,6 +42,10 @@ class Connection(object):
         with self.settings():
             fabric_api.run(command)
 
+    def sudo(self, command):
+        with self.settings():
+            fabric_api.sudo(command)
+
 
 @contextlib.contextmanager
 def connect(username, host):

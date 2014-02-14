@@ -70,3 +70,22 @@ def install():
         connection.put(data.install_script(), 'install.sh')
         connection.run('bash install.sh "%s" "%s"' %
                        (args.nodepool_repo, args.nodepool_branch))
+
+
+def parse_start_args():
+    parser = argparse.ArgumentParser(description="Start Nodepool")
+    parser.add_argument('username', help='Username to target host')
+    parser.add_argument('host', help='Target host')
+    return parser.parse_args()
+
+
+def issues_for_start_args(args):
+    issues = remote_system_access_issues(args.username, args.host)
+    return issues
+
+
+def start():
+    args = get_args_or_die(parse_start_args, issues_for_start_args)
+
+    with remote.connect(args.username, args.host) as connection:
+        connection.sudo('service nodepool start')
