@@ -47,7 +47,7 @@ def issues_with_line(line):
 def bash_env_parsing_issues(bash_lines):
     """
     >>> bash_env_parsing_issues('\\n'.join(['stuff']))
-    ['line 1: The expected format for each line is: "export VARNAME=VALUE"']
+    ['line 1: The expected format for each line is: "export VARNAME=VALUE" found: "stuff"']
     """
     issues = []
     for idx, line in enumerate(to_lines(bash_lines)):

@@ -16,6 +16,12 @@ def parse_install_args():
     parser.add_argument('rsparams', help='Rackspace settings file')
     parser.add_argument('rspass', help='Rackspace password')
     parser.add_argument('--image_name', default='devstack-xenserver', help='Image name to use')
+    parser.add_argument('--nodepool_repo',
+                        default='https://github.com/citrix-openstack/nodepool.git',
+                        help='Nodepool repository')
+    parser.add_argument('--nodepool_branch',
+                        default='master',
+                        help='Nodepool branch')
     return parser.parse_args()
 
 
@@ -62,4 +68,5 @@ def install():
         connection.put(pubkey_for(args.private_key), '.ssh/nodepool.pub')
         connection.run('chmod 0400 .ssh/nodepool')
         connection.put(data.install_script(), 'install.sh')
-        connection.run('bash install.sh "%s"' % (args.rspass, ))
+        connection.run('bash install.sh "%s" "%s"' %
+                       (args.nodepool_repo, args.nodepool_branch))

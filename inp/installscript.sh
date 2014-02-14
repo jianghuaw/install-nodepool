@@ -1,6 +1,7 @@
 set -eux
 
-RACKSPACE_PASSWORD="$1"
+NODEPOOL_REPO="$1"
+NODEPOOL_BRANCH="$2"
 
 ######
 # Update apt
@@ -22,7 +23,8 @@ pushd config
 popd
 
 #git clone git@github.com:citrix-openstack/nodepool.git
-git clone https://github.com/citrix-openstack/nodepool.git
+git clone "$NODEPOOL_REPO"
+( cd nodepool && git checkout "$NODEPOOL_BRANCH" )
 pushd nodepool
 popd
 
@@ -64,9 +66,16 @@ stop on runlevel [016]
 chdir /
 
 script
+    export NODEPOOL_SSH_KEY="\$(cat /home/ubuntu/.ssh/nodepool.pub)"
     /usr/bin/python /usr/local/bin/nodepoold -c /etc/nodepool/nodepool.yaml -l /home/ubuntu/src/config/modules/nodepool/files/logging.conf
 end script
 NODEPOOLSTARTER
+
+# As nodepool will be executed as root, we need to give the ssh key to root
+sudo mkdir /root/.ssh
+sudo cp /home/ubuntu/.ssh/nodepool /root/.ssh/id_rsa
+sudo chmod 0400 /root/.ssh/id_rsa
+sudo chmod 0500 /root/.ssh
 
 #####
 # Start now

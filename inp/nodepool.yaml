@@ -28,14 +28,16 @@ providers:
         base-image: '62df001e-87ee-407c-b042-6f4e13f5d7e1'
         min-ram: 8192
         name-filter: 'Performance'
-        install: install_xenserver.sh
-        install_poll_interval: 10
-        install_poll_count: 80
-        install_status_file: /var/run/xenserver.ready
-        launch_poll_interval: 10
-        launch_poll_count: 40
-        launch_done_stamp: /var/run/xenserver.ready
-        username: 'root'
+        install: 'install_xenserver.sh'
+        install-poll-interval: 10
+        install-poll-count: 80
+        install-done-stamp: /var/run/xenserver.ready
+        launch-poll-interval: 10
+        launch-poll-count: 40
+        launch-done-stamp: /var/run/xenserver.ready
+        pre-snapshot-timeout: 600
+        setup: 'prepare_node_xenserver.sh'
+        username: 'jenkins'
         private-key: /home/ubuntu/.ssh/nodepool
 
 targets:
