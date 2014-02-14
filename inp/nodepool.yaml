@@ -36,8 +36,8 @@ providers:
         launch-poll-count: 40
         launch-done-stamp: /var/run/xenserver.ready
         wait-for-shutoff-before-snapshot: true
-        pre-snapshot-count: 60
-        pre-snapshot-interval: 10
+        shutoff-poll-count: 60
+        shutoff-poll-interval: 10
         setup: 'prepare_node_xenserver.sh'
         username: 'jenkins'
         private-key: /home/ubuntu/.ssh/nodepool
