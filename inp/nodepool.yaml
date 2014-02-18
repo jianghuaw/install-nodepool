@@ -41,6 +41,7 @@ providers:
         setup: 'prepare_node_xenserver.sh'
         username: 'jenkins'
         private-key: /home/ubuntu/.ssh/nodepool
+        pre-snapshot-timeout: 300
 
 targets:
   - name: fake-jenkins
