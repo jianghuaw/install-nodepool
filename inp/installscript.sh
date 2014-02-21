@@ -8,8 +8,7 @@ NODEPOOL_BRANCH="$2"
 sudo sed -ie "s,mirror.anl.gov/pub/ubuntu,mirror.pnl.gov/ubuntu,g" /etc/apt/sources.list
 sudo apt-get -qy update
 sudo DEBIAN_FRONTEND=noninteractive apt-get install -qy git mysql-server libmysqlclient-dev g++ python-dev libzmq-dev python-pip < /dev/null
-sudo apt-get install -qy gearman-job-server < /dev/null
-sudo apt-get install -qy python-novaclient < /dev/null
+sudo DEBIAN_FRONTEND=noninteractive apt-get install -qy gearman-job-server python-novaclient emacs23-nox < /dev/null
 
 ######
 # Download nodepool + config
@@ -46,8 +45,11 @@ flush privileges;
 DBINIT
 
 source ~/.bash_profile
-nova keypair-delete nodepool || true
-nova keypair-add --pub-key ~/.ssh/nodepool.pub nodepool
+
+for region in ORD DFW IAD; do
+    OS_REGION_NAME=$region nova keypair-delete nodepool || true
+    OS_REGION_NAME=$region nova keypair-add --pub-key ~/.ssh/nodepool.pub nodepool
+done
 
 ######
 # Config file for nodepool

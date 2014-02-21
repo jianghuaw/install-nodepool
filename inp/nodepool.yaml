@@ -13,7 +13,7 @@ gearman-servers:
 
 providers:
   - name: rax-iad
-    region-name: '$OS_REGION_NAME'
+    region-name: 'IAD'
     service-type: 'compute'
     service-name: 'cloudServersOpenStack'
     username: '$OS_USERNAME'
@@ -21,7 +21,67 @@ providers:
     project-id: '$OS_PROJECT_ID'
     auth-url: '$OS_AUTH_URL'
     boot-timeout: 120
-    max-servers: 2
+    max-servers: 30
+    keypair: nodepool
+    images:
+      - name: '$IMAGE_NAME'
+        base-image: '62df001e-87ee-407c-b042-6f4e13f5d7e1'
+        min-ram: 8192
+        name-filter: 'Performance'
+        install: 'install_xenserver.sh'
+        install-poll-interval: 10
+        install-poll-count: 80
+        install-done-stamp: /var/run/xenserver.ready
+        launch-poll-interval: 10
+        launch-poll-count: 40
+        launch-done-stamp: /var/run/xenserver.ready
+        wait-for-shutoff-before-snapshot: true
+        shutoff-poll-count: 60
+        shutoff-poll-interval: 10
+        setup: 'prepare_node_xenserver.sh'
+        username: 'jenkins'
+        private-key: /home/ubuntu/.ssh/nodepool
+        pre-snapshot-timeout: 300
+  - name: rax-dfw
+    region-name: 'DFW'
+    service-type: 'compute'
+    service-name: 'cloudServersOpenStack'
+    username: '$OS_USERNAME'
+    password: '$RACKSPACE_PASSWORD'
+    project-id: '$OS_PROJECT_ID'
+    auth-url: '$OS_AUTH_URL'
+    boot-timeout: 120
+    max-servers: 15
+    keypair: nodepool
+    images:
+      - name: '$IMAGE_NAME'
+        base-image: '62df001e-87ee-407c-b042-6f4e13f5d7e1'
+        min-ram: 8192
+        name-filter: 'Performance'
+        install: 'install_xenserver.sh'
+        install-poll-interval: 10
+        install-poll-count: 80
+        install-done-stamp: /var/run/xenserver.ready
+        launch-poll-interval: 10
+        launch-poll-count: 40
+        launch-done-stamp: /var/run/xenserver.ready
+        wait-for-shutoff-before-snapshot: true
+        shutoff-poll-count: 60
+        shutoff-poll-interval: 10
+        setup: 'prepare_node_xenserver.sh'
+        username: 'jenkins'
+        private-key: /home/ubuntu/.ssh/nodepool
+        pre-snapshot-timeout: 300
+  - name: rax-ord
+    region-name: 'ORD'
+    service-type: 'compute'
+    service-name: 'cloudServersOpenStack'
+    username: '$OS_USERNAME'
+    password: '$RACKSPACE_PASSWORD'
+    project-id: '$OS_PROJECT_ID'
+    auth-url: '$OS_AUTH_URL'
+    boot-timeout: 120
+    max-servers: 15
     keypair: nodepool
     images:
       - name: '$IMAGE_NAME'
@@ -51,6 +111,8 @@ targets:
       apikey: fake
     images:
       - name: '$IMAGE_NAME'
-        min-ready: 1
+        min-ready: 5
         providers:
           - name: rax-iad
+          - name: rax-ord
+          - name: rax-dfw
