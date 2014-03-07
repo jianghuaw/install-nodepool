@@ -16,8 +16,8 @@ def get_filelike(fname):
         return filelike
 
 
-def install_script():
-    return get_filelike('installscript.sh')
+def install_script(script):
+    return get_filelike(script)
 
 
 def nodepool_config(cloud_env):

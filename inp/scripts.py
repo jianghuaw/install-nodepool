@@ -1,5 +1,6 @@
 import argparse
 import StringIO
+import logging
 
 from inp import remote
 from inp import data
@@ -15,7 +16,7 @@ def parse_install_args():
     parser.add_argument('host', help='Target host')
     parser.add_argument('rsparams', help='Rackspace settings file')
     parser.add_argument('rspass', help='Rackspace password')
-    parser.add_argument('--image_name', default='devstack-xenserver', help='Image name to use')
+    parser.add_argument('--image_name', default='xsdsvm', help='Image name to use')
     parser.add_argument('--nodepool_repo',
                         default='https://github.com/citrix-openstack/nodepool.git',
                         help='Nodepool repository')
@@ -67,7 +68,7 @@ def install():
         connection.put(args.private_key, '.ssh/nodepool')
         connection.put(pubkey_for(args.private_key), '.ssh/nodepool.pub')
         connection.run('chmod 0400 .ssh/nodepool')
-        connection.put(data.install_script(), 'install.sh')
+        connection.put(data.install_script('installscript.sh'), 'install.sh')
         connection.run('bash install.sh "%s" "%s"' %
                        (args.nodepool_repo, args.nodepool_branch))
 
@@ -89,3 +90,42 @@ def start():
 
     with remote.connect(args.username, args.host) as connection:
         connection.sudo('service nodepool start')
+
+
+def parse_osci_install_args():
+    parser = argparse.ArgumentParser(description="Install OSCI")
+    parser.add_argument('private_key', help='Private key file')
+    parser.add_argument('username', help='Username to target host')
+    parser.add_argument('host', help='Target host')
+    parser.add_argument('params', help='OSCI settings file')
+    parser.add_argument('--image_name', default='xsdsvm', help='Image name to use')
+    parser.add_argument('--osci_repo',
+                        default='https://github.com/citrix-openstack/openstack-citrix-ci.git',
+                        help='OSCI repository')
+    parser.add_argument('--osci_branch',
+                        default='master',
+                        help='Nodepool branch')
+    return parser.parse_args()
+
+
+def issues_for_osci_install_args(args):
+    issues = (
+        file_access_issues(args.private_key)
+        + file_access_issues(pubkey_for(args.private_key))
+        + remote_system_access_issues(args.username, args.host)
+    )
+
+    return issues
+
+
+def osci_install():
+    args = get_args_or_die(parse_osci_install_args, issues_for_osci_install_args)
+
+    with remote.connect(args.username, args.host) as connection:
+        connection.put(args.private_key, '.ssh/citrix_gerrit')
+        connection.put(pubkey_for(args.private_key), '.ssh/citrix_gerrit.pub')
+        connection.run('chmod 0400 .ssh/citrix_gerrit')
+        connection.put(args.params, 'osci.config')
+        connection.put(data.install_script('osci_installscript.sh'), 'osci_installscript.sh')
+        connection.run('bash osci_installscript.sh "%s" "%s"' %
+                       (args.osci_repo, args.osci_branch))

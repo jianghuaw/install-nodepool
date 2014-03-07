@@ -8,7 +8,7 @@ NODEPOOL_BRANCH="$2"
 sudo sed -ie "s,mirror.anl.gov/pub/ubuntu,mirror.pnl.gov/ubuntu,g" /etc/apt/sources.list
 sudo apt-get -qy update
 sudo DEBIAN_FRONTEND=noninteractive apt-get install -qy git mysql-server libmysqlclient-dev g++ python-dev libzmq-dev python-pip < /dev/null
-sudo DEBIAN_FRONTEND=noninteractive apt-get install -qy gearman-job-server python-novaclient emacs23-nox < /dev/null
+sudo DEBIAN_FRONTEND=noninteractive apt-get install -qy gearman-job-server emacs23-nox < /dev/null
 
 ######
 # Download nodepool + config
@@ -33,7 +33,7 @@ pushd nodepool
 sudo pip install -U distribute
 sudo pip install -U -r requirements.txt
 sudo pip install -e .
-sudo pip install rackspace-auth-openstack
+sudo pip install python-novaclient rackspace-auth-openstack
 popd
 
 ######
@@ -68,14 +68,16 @@ stop on runlevel [016]
 chdir /
 
 script
-    export NODEPOOL_SSH_KEY="\$(cat /home/ubuntu/.ssh/nodepool.pub)"
+    export NODEPOOL_SSH_KEY="\$(cat $HOME/.ssh/nodepool.pub)"
     /usr/bin/python /usr/local/bin/nodepoold -c /etc/nodepool/nodepool.yaml -l /home/ubuntu/src/config/modules/nodepool/files/logging.conf
 end script
 NODEPOOLSTARTER
 
 # As nodepool will be executed as root, we need to give the ssh key to root
-sudo mkdir /root/.ssh
-sudo cp /home/ubuntu/.ssh/nodepool /root/.ssh/id_rsa
-sudo chmod 0400 /root/.ssh/id_rsa
-sudo chmod 0500 /root/.ssh
+if [ ! -e /root/.ssh/nodepool ]; then
+    [ -e /root/.ssh ] || sudo mkdir /root/.ssh
+    sudo cp $HOME/.ssh/nodepool /root/.ssh/id_rsa
+    sudo chmod 0400 /root/.ssh/id_rsa
+    sudo chmod 0500 /root/.ssh
+fi
 
