@@ -33,6 +33,8 @@ GRANT ALL ON openstack_ci.* TO 'nodepool'@'localhost';
 flush privileges;
 DBINIT
 
+osci-create-dbschema
+
 sudo tee /etc/init/citrix-ci.conf << CITRIXCISTARTER
 start on runlevel [2345]
 stop on runlevel [016]
