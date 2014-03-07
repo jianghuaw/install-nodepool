@@ -129,3 +129,24 @@ def osci_install():
         connection.put(data.install_script('osci_installscript.sh'), 'osci_installscript.sh')
         connection.run('bash osci_installscript.sh "%s" "%s"' %
                        (args.osci_repo, args.osci_branch))
+
+
+def parse_osci_start_args():
+    parser = argparse.ArgumentParser(description="Start OSCI")
+    parser.add_argument('username', help='Username to target host')
+    parser.add_argument('host', help='Target host')
+    return parser.parse_args()
+
+
+def issues_for_osci_start_args(args):
+    issues = remote_system_access_issues(args.username, args.host)
+    return issues
+
+
+def osci_start():
+    args = get_args_or_die(parse_osci_start_args, issues_for_osci_start_args)
+
+    with remote.connect(args.username, args.host) as connection:
+        connection.sudo('service citrix-ci start')
+        connection.sudo('service citrix-ci-gerritwatch start')
+
