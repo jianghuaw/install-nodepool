@@ -20,8 +20,8 @@ providers:
     password: '$RACKSPACE_PASSWORD'
     project-id: '$OS_PROJECT_ID'
     auth-url: '$OS_AUTH_URL'
-    boot-timeout: 120
-    max-servers: 30
+    boot-timeout: 60
+    max-servers: 25
     keypair: nodepool
     images:
       - name: '$IMAGE_NAME'
@@ -50,8 +50,8 @@ providers:
     password: '$RACKSPACE_PASSWORD'
     project-id: '$OS_PROJECT_ID'
     auth-url: '$OS_AUTH_URL'
-    boot-timeout: 120
-    max-servers: 15
+    boot-timeout: 60
+    max-servers: 14
     keypair: nodepool
     images:
       - name: '$IMAGE_NAME'
@@ -80,8 +80,8 @@ providers:
     password: '$RACKSPACE_PASSWORD'
     project-id: '$OS_PROJECT_ID'
     auth-url: '$OS_AUTH_URL'
-    boot-timeout: 120
-    max-servers: 15
+    boot-timeout: 60
+    max-servers: 14
     keypair: nodepool
     images:
       - name: '$IMAGE_NAME'
@@ -111,7 +111,7 @@ targets:
       apikey: fake
     images:
       - name: '$IMAGE_NAME'
-        min-ready: 5
+        min-ready: 8
         providers:
           - name: rax-iad
           - name: rax-ord
