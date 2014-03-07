@@ -8,7 +8,7 @@ setup(
     packages=['inp'],
     install_requires=['fabric'],
     package_data = {
-        'inp': ['installscript.sh', 'nodepool.yaml'],
+        'inp': ['installscript.sh', 'osci_installscript.sh', 'nodepool.yaml'],
     },
     entry_points = {
         'console_scripts': [

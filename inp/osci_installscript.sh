@@ -33,6 +33,8 @@ GRANT ALL ON openstack_ci.* TO 'nodepool'@'localhost';
 flush privileges;
 DBINIT
 
+osci-create-dbschema
+
 sudo tee /etc/init/citrix-ci.conf << CITRIXCISTARTER
 start on runlevel [2345]
 stop on runlevel [016]
@@ -41,13 +43,25 @@ respawn
 respawn limit 3 60
 
 script
-start-stop-daemon --start --make-pidfile --pidfile /var/run/citrix-ci.pid --exec /bin/bash -- -c "/home/ubuntu/src/openstack-citrix-ci/citrix-ci.sh >> /var/log/citrix-ci.log 2>&1" 
+start-stop-daemon --start --make-pidfile --pidfile /var/run/citrix-ci.pid --exec /bin/bash -- -c "/root/src/openstack-citrix-ci/citrix-ci.sh >> /var/log/citrix-ci.log 2>&1"
 end script
 CITRIXCISTARTER
 
+sudo tee /etc/init/citrix-ci-gerritwatch.conf << GERRITWATCH
+start on runlevel [2345]
+stop on runlevel [016]
+
+respawn
+respawn limit 3 60
+
+script
+start-stop-daemon --start --make-pidfile --pidfile /var/run/citrix-ci-gerritwatch.pid --exec /bin/bash -- -c "/root/src/openstack-citrix-ci/citrix-ci-gerritwatch.sh >> /var/log/citrix-ci-gerritwatch.log 2>&1"
+end script
+GERRITWATCH
+
 if [ ! -e /root/.ssh/citrix_gerrit ]; then
     [ -e /root/.ssh ] || sudo mkdir /root/.ssh
-    sudo cp /home/ubuntu/.ssh/citrix_gerrit /root/.ssh/
+    sudo cp /root/.ssh/citrix_gerrit /root/.ssh/
     sudo chmod 0400 /root/.ssh/citrix_gerrit
     sudo chmod 0500 /root/.ssh
 fi
