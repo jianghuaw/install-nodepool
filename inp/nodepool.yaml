@@ -1,4 +1,4 @@
-script-dir: /home/ubuntu/src/config/modules/openstack_project/files/nodepool/scripts/
+script-dir: /root/src/config/modules/openstack_project/files/nodepool/scripts/
 dburi: 'mysql://nodepool@localhost/nodepool'
 
 cron:
@@ -40,7 +40,7 @@ providers:
         shutoff-poll-interval: 10
         setup: 'prepare_node_xenserver.sh'
         username: 'jenkins'
-        private-key: /home/ubuntu/.ssh/nodepool
+        private-key: /root/.ssh/nodepool
         pre-snapshot-timeout: 300
   - name: rax-dfw
     region-name: 'DFW'
@@ -70,7 +70,7 @@ providers:
         shutoff-poll-interval: 10
         setup: 'prepare_node_xenserver.sh'
         username: 'jenkins'
-        private-key: /home/ubuntu/.ssh/nodepool
+        private-key: /root/.ssh/nodepool
         pre-snapshot-timeout: 300
   - name: rax-ord
     region-name: 'ORD'
@@ -100,7 +100,7 @@ providers:
         shutoff-poll-interval: 10
         setup: 'prepare_node_xenserver.sh'
         username: 'jenkins'
-        private-key: /home/ubuntu/.ssh/nodepool
+        private-key: /root/.ssh/nodepool
         pre-snapshot-timeout: 300
 
 targets:
