@@ -69,7 +69,7 @@ chdir /
 
 script
     export NODEPOOL_SSH_KEY="\$(cat $HOME/.ssh/nodepool.pub)"
-    /usr/bin/python /usr/local/bin/nodepoold -c /etc/nodepool/nodepool.yaml -l /home/ubuntu/src/config/modules/nodepool/files/logging.conf
+    /usr/bin/python /usr/local/bin/nodepoold -c /etc/nodepool/nodepool.yaml -l /root/src/config/modules/nodepool/files/logging.conf
 end script
 NODEPOOLSTARTER
 
