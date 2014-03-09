@@ -74,10 +74,8 @@ end script
 NODEPOOLSTARTER
 
 # As nodepool will be executed as root, we need to give the ssh key to root
-if [ ! -e /root/.ssh/nodepool ]; then
-    [ -e /root/.ssh ] || sudo mkdir /root/.ssh
-    sudo cp $HOME/.ssh/nodepool /root/.ssh/id_rsa
-    sudo chmod 0400 /root/.ssh/id_rsa
-    sudo chmod 0500 /root/.ssh
-fi
+[ -e /root/.ssh ] || sudo mkdir /root/.ssh
+sudo cp $HOME/.ssh/nodepool /root/.ssh/id_rsa
+sudo chmod 0400 /root/.ssh/id_rsa
+sudo chmod 0500 /root/.ssh
 
