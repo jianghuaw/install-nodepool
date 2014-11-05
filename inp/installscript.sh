@@ -5,7 +5,6 @@ NODEPOOL_BRANCH="$2"
 
 ######
 # Update apt
-sudo sed -ie "s,mirror.anl.gov/pub/ubuntu,mirror.pnl.gov/ubuntu,g" /etc/apt/sources.list
 sudo apt-get -qy update
 sudo DEBIAN_FRONTEND=noninteractive apt-get install -qy git mysql-server libmysqlclient-dev g++ python-dev libzmq-dev python-pip < /dev/null
 sudo DEBIAN_FRONTEND=noninteractive apt-get install -qy gearman-job-server emacs23-nox < /dev/null
