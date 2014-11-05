@@ -58,10 +58,10 @@ def install():
     args = get_args_or_die(parse_install_args, issues_for_install_args)
 
     with remote.connect(args.username, args.host, args.port) as connection:
-        connection.run('rm -f install.sh')
         connection.put(data.install_script('installscript.sh'), 'install.sh')
         connection.run('bash install.sh "%s" "%s"' %
                        (args.nodepool_repo, args.nodepool_branch))
+        connection.run('rm -f install.sh')
 
 
 def parse_start_args():
