@@ -146,6 +146,7 @@ script
         $NODEPOOL_VENV/bin/nodepoold \\
         -c $NODEPOOL_CFG/nodepool.yaml \\
         -l $NODEPOOL_CFG/logging.conf \\
-        -p $NODEPOOL_HOME/nodepool.pid
+        -p $NODEPOOL_HOME/nodepool.pid \\
+        -d
 end script
 NODEPOOLSTARTER
