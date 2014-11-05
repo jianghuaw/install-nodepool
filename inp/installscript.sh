@@ -9,10 +9,6 @@ sudo apt-get -qy update
 sudo DEBIAN_FRONTEND=noninteractive apt-get install -qy git mysql-server libmysqlclient-dev g++ python-dev libzmq-dev python-pip < /dev/null
 sudo DEBIAN_FRONTEND=noninteractive apt-get install -qy gearman-job-server emacs23-nox < /dev/null
 
-######
-# Download nodepool + config
-echo -e "Host github.com\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config
-
 mkdir src
 cd ~/src
 #git clone git@github.com:citrix-openstack/config.git
