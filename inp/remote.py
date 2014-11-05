@@ -5,28 +5,30 @@ from fabric import operations
 from fabric import network as fabric_network
 
 
-def fabric_settings(username, host):
+def fabric_settings(username, host, port):
     return fabric_api.settings(
         host_string=host,
         abort_on_prompts=True,
+        port=port,
         user=username)
 
-def check_connection(username, host):
-    with fabric_settings(username, host):
+def check_connection(username, host, port):
+    with fabric_settings(username, host, port):
         result = fabric_api.run('true')
         return result.return_code == 0
 
 
-def check_sudo(username, host):
-    with fabric_settings(username, host):
+def check_sudo(username, host, port):
+    with fabric_settings(username, host, port):
         result = fabric_api.sudo('true')
         return result.return_code == 0
 
 
 class Connection(object):
-    def __init__(self, username, host):
+    def __init__(self, username, host, port):
         self.username = username
         self.host = host
+        self.port = port
 
     def put(self, local_fname, remote_fname):
         with self.settings():
@@ -36,7 +38,7 @@ class Connection(object):
         fabric_network.disconnect_all()
 
     def settings(self):
-        return fabric_settings(self.username, self.host)
+        return fabric_settings(self.username, self.host, self.port)
 
     def run(self, command):
         with self.settings():
@@ -48,7 +50,7 @@ class Connection(object):
 
 
 @contextlib.contextmanager
-def connect(username, host):
-    connection = Connection(username, host)
+def connect(username, host, port):
+    connection = Connection(username, host, port)
     yield connection
     connection.disconnect()

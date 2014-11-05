@@ -9,32 +9,36 @@ from inp import templating
 from inp.validation import file_access_issues, remote_system_access_issues, get_args_or_die, die_if_issues_found
 
 
+DEFAULT_NODEPOOL_REPO = 'https://github.com/citrix-openstack/nodepool.git'
+DEFAULT_NODEPOOL_BRANCH = 'master'
+DEFAULT_PORT = 22
+
+
 def parse_install_args():
     parser = argparse.ArgumentParser(description="Install Nodepool")
-    parser.add_argument('private_key', help='Private key file')
     parser.add_argument('username', help='Username to target host')
     parser.add_argument('host', help='Target host')
-    parser.add_argument('rsparams', help='Rackspace settings file')
-    parser.add_argument('rspass', help='Rackspace password')
-    parser.add_argument('--image_name', default='xsdsvm', help='Image name to use')
-    parser.add_argument('--nodepool_repo',
-                        default='https://github.com/citrix-openstack/nodepool.git',
-                        help='Nodepool repository')
-    parser.add_argument('--nodepool_branch',
-                        default='master',
-                        help='Nodepool branch')
+    parser.add_argument(
+        '--port',
+        type=int,
+        default=DEFAULT_PORT,
+        help='SSH port to use (default: %s)' % DEFAULT_PORT
+    )
+    parser.add_argument(
+        '--nodepool_repo',
+        default=DEFAULT_NODEPOOL_REPO,
+        help='Nodepool repository (default: %s)' % DEFAULT_NODEPOOL_REPO,
+    )
+    parser.add_argument(
+        '--nodepool_branch',
+        default='master',
+        help='Nodepool branch (default: %s)' % DEFAULT_NODEPOOL_BRANCH,
+    )
     return parser.parse_args()
 
 
 def issues_for_install_args(args):
-    issues = (
-        file_access_issues(args.private_key)
-        + file_access_issues(args.rsparams)
-        + file_access_issues(pubkey_for(args.private_key))
-        + remote_system_access_issues(args.username, args.host)
-    )
-
-    return issues
+    return remote_system_access_issues(args.username, args.host, args.port)
 
 
 def pubkey_for(privkey):
@@ -52,22 +56,9 @@ def get_params_or_die(cloud_parameters_file):
 
 def install():
     args = get_args_or_die(parse_install_args, issues_for_install_args)
-    cloud_env = get_params_or_die(args.rsparams)
-    cloud_env['RACKSPACE_PASSWORD'] = args.rspass
-    cloud_env['IMAGE_NAME'] = args.image_name
-    nodepool_config_file = data.nodepool_config(cloud_env)
 
-    with remote.connect(args.username, args.host) as connection:
-        connection.run('rm -f .bash_profile')
-        connection.run('rm -f .ssh/nodepool')
-        connection.run('rm -f .ssh/nodepool.pub')
+    with remote.connect(args.username, args.host, args.port) as connection:
         connection.run('rm -f install.sh')
-        connection.run('rm -f nodepool.yaml')
-        connection.put(nodepool_config_file, 'nodepool.yaml')
-        connection.put(args.rsparams, '.bash_profile')
-        connection.put(args.private_key, '.ssh/nodepool')
-        connection.put(pubkey_for(args.private_key), '.ssh/nodepool.pub')
-        connection.run('chmod 0400 .ssh/nodepool')
         connection.put(data.install_script('installscript.sh'), 'install.sh')
         connection.run('bash install.sh "%s" "%s"' %
                        (args.nodepool_repo, args.nodepool_branch))
@@ -81,7 +72,7 @@ def parse_start_args():
 
 
 def issues_for_start_args(args):
-    issues = remote_system_access_issues(args.username, args.host)
+    issues = remote_system_access_issues(args.username, args.host, args.port)
     return issues
 
 
@@ -112,7 +103,7 @@ def issues_for_osci_install_args(args):
     issues = (
         file_access_issues(args.private_key)
         + file_access_issues(pubkey_for(args.private_key))
-        + remote_system_access_issues(args.username, args.host)
+        + remote_system_access_issues(args.username, args.host, args.port)
     )
 
     return issues
@@ -139,7 +130,7 @@ def parse_osci_start_args():
 
 
 def issues_for_osci_start_args(args):
-    issues = remote_system_access_issues(args.username, args.host)
+    issues = remote_system_access_issues(args.username, args.host, args.port)
     return issues
 
 

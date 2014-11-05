@@ -18,12 +18,12 @@ def file_access_issues(fpath):
     return message_for_first_issue(checks)
 
 
-def remote_system_access_issues(username, host):
+def remote_system_access_issues(username, host, port):
     checks = [
-        (lambda: remote.check_connection(username, host),
-            'Cannot connect to %s using %s' % (username, host)),
-        (lambda: remote.check_sudo(username, host),
-            'Cannot sudo on %s as %s' % (username, host))
+        (lambda: remote.check_connection(username, host, port),
+            'Cannot connect to %s:%s using %s' % (host, port, username)),
+        (lambda: remote.check_sudo(username, host, port),
+            'Cannot sudo on %s:%s as %s' % (host, port, username))
     ]
     return message_for_first_issue(checks)
 
