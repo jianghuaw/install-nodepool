@@ -14,6 +14,36 @@ DEFAULT_NODEPOOL_BRANCH = 'master'
 DEFAULT_PORT = 22
 
 
+class NodepoolInstallEnv(object):
+    def __init__(self, repo, branch):
+        self.username = username = 'nodepool'
+        self.home = home = '/home/{username}'.format(username=username)
+        self.venv = '{home}/env'.format(home=home)
+        self.sources = '{home}/src/nodepool'.format(home=home)
+        self.config_dir = '{home}/conf'.format(home=home)
+        self.logs = '{home}/logs'.format(home=home)
+        self.config_file = 'nodepool.yaml'
+        self.repo = repo
+        self.branch = branch
+
+    @property
+    def bashline(self):
+        env = dict(
+            NODEPOOL_REPO=self.repo,
+            NODEPOOL_BRANCH=self.branch,
+            NODEPOOL_USER=self.username,
+            NODEPOOL_HOME_DIR=self.home,
+            NODEPOOL_VENV_DIR=self.venv,
+            NODEPOOL_SRC_DIR=self.sources,
+            NODEPOOL_CFG_DIR=self.config_dir,
+            NODEPPOL_LOGS_DIR=self.logs,
+            NODEPOOL_CFG_BASENAME=self.config_file,
+        )
+
+        return ' '.join('{key}={value}'.format(key=key, value=value) for
+            key, value in env.iteritems())
+
+
 def parse_install_args():
     parser = argparse.ArgumentParser(description="Install Nodepool")
     parser.add_argument('username', help='Username to target host')
@@ -57,10 +87,11 @@ def get_params_or_die(cloud_parameters_file):
 def install():
     args = get_args_or_die(parse_install_args, issues_for_install_args)
 
+    env = NodepoolInstallEnv(args.nodepool_repo, args.nodepool_branch)
+
     with remote.connect(args.username, args.host, args.port) as connection:
         connection.put(data.install_script('installscript.sh'), 'install.sh')
-        connection.run('bash install.sh "%s" "%s"' %
-                       (args.nodepool_repo, args.nodepool_branch))
+        connection.run('%s bash install.sh' % env.bashline)
         connection.run('rm -f install.sh')
 
 

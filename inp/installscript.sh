@@ -1,17 +1,5 @@
 set -eux
 
-NODEPOOL_REPO="$1"
-NODEPOOL_BRANCH="$2"
-
-NODEPOOL_USER="nodepool"
-NODEPOOL_HOME_DIR="/home/$NODEPOOL_USER"
-NODEPOOL_VENV_DIR="$NODEPOOL_HOME_DIR/env"
-NODEPOOL_SRC_DIR="$NODEPOOL_HOME_DIR/src/nodepool"
-NODEPOOL_CFG_DIR="$NODEPOOL_HOME_DIR/conf"
-NODEPPOL_LOGS_DIR="$NODEPOOL_HOME_DIR/logs"
-NODEPOOL_CFG_BASENAME="nodepool.yaml"
-
-
 ######
 # Install system level dependencies
 sudo apt-get -qy update
