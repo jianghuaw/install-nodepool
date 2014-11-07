@@ -9,6 +9,7 @@ NODEPOOL_VENV_DIR="$NODEPOOL_HOME_DIR/env"
 NODEPOOL_SRC_DIR="$NODEPOOL_HOME_DIR/src/nodepool"
 NODEPOOL_CFG_DIR="$NODEPOOL_HOME_DIR/conf"
 NODEPPOL_LOGS_DIR="$NODEPOOL_HOME_DIR/logs"
+NODEPOOL_CFG_BASENAME="nodepool.yaml"
 
 
 ######
@@ -144,7 +145,7 @@ script
     export NODEPOOL_SSH_KEY="\$(cat $HOME/.ssh/nodepool.pub)"
     $NODEPOOL_VENV_DIR/bin/python \\
         $NODEPOOL_VENV_DIR/bin/nodepoold \\
-        -c $NODEPOOL_CFG_DIR/nodepool.yaml \\
+        -c $NODEPOOL_CFG_DIR/$NODEPOOL_CFG_BASENAME \\
         -l $NODEPOOL_CFG_DIR/logging.conf \\
         -p $NODEPOOL_HOME_DIR/nodepool.pid \\
         -d
