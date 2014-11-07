@@ -7,7 +7,7 @@ NODEPOOL_USER="nodepool"
 NODEPOOL_HOME="/home/$NODEPOOL_USER"
 NODEPOOL_VENV="$NODEPOOL_HOME/env"
 NODEPOOL_SRC="$NODEPOOL_HOME/src/nodepool"
-NODEPOOL_CFG="$NODEPOOL_HOME/conf"
+NODEPOOL_CFG_DIR="$NODEPOOL_HOME/conf"
 NODEPOOL_LOGS="$NODEPOOL_HOME/logs"
 
 
@@ -60,7 +60,7 @@ in_venv "pip install python-novaclient rackspace-auth-openstack"
 
 ######
 # Create config and logging dir
-as_nodepool "mkdir $NODEPOOL_CFG"
+as_nodepool "mkdir $NODEPOOL_CFG_DIR"
 as_nodepool "mkdir $NODEPOOL_LOGS"
 
 
@@ -73,7 +73,7 @@ flush privileges;
 DBINIT
 
 
-sudo -u $NODEPOOL_USER tee $NODEPOOL_CFG/logging.conf << EOF
+sudo -u $NODEPOOL_USER tee $NODEPOOL_CFG_DIR/logging.conf << EOF
 [loggers]
 keys=root,nodepool,requests,image
 
@@ -144,8 +144,8 @@ script
     export NODEPOOL_SSH_KEY="\$(cat $HOME/.ssh/nodepool.pub)"
     $NODEPOOL_VENV/bin/python \\
         $NODEPOOL_VENV/bin/nodepoold \\
-        -c $NODEPOOL_CFG/nodepool.yaml \\
-        -l $NODEPOOL_CFG/logging.conf \\
+        -c $NODEPOOL_CFG_DIR/nodepool.yaml \\
+        -l $NODEPOOL_CFG_DIR/logging.conf \\
         -p $NODEPOOL_HOME/nodepool.pid \\
         -d
 end script
