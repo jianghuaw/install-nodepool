@@ -18,11 +18,15 @@ VM is running **Ubuntu 14.04.1 LTS**.
 
 Now you need to create a key to be used to communicate with the box:
 
-    ssh-keygen -f ubuntu.key -N ""
+    ssh-keygen -f ubuntu.key -N "" -C "osci-controller"
 
-And another one to be used by nodepool
+And another one to be used by nodepool:
 
-    ssh-keygen -f osci.key -N ""
+    ssh-keygen -f nodepool.key -N "" -C "osci-nodepool"
+
+And one to be used by jenkins:
+
+    ssh-keygen -f jenkins.key -N "" -C "osci-jenkins"
 
 To enable passwordless authentication to the new system, load an agent and add
 the key:
@@ -47,3 +51,44 @@ To install nodepool (but not to start it yet!), you should do the following:
 
 After this operation, you should be have startup files in place for nodepool.
 
+### Configure nodepool
+
+Next phase to configure the instance. This includes specifying the key files to
+be used, and an image name that will be used. As the nodepool config file
+needs your cloud credentials, you also have to specify an openrc file. This
+file could be downloaded from rackspace once you're logged in. You will also
+need to specify the password for your rackspace account.
+
+    inp-nodepool-configure --port 2424 ubuntu 127.0.0.1 openrc DEMO \
+        nodepool.key jenkins.key rspass
+
+Please note, that you can also specify `--min-ready` to specify the number of
+nodes to be baked. For demo purposes you might want to specify it as `1`.
+
+### Set up cloud keys
+
+Now nodepool is configured, you need to upload your key to be used to the
+cloud so that you can communicate with the instances launched:
+
+    inp-upload-keys ubuntu 127.0.0.1 openrc --port=2424
+
+By default it will not update your keys, so if you have existing keys, it will
+fail. To remove the existing keys, specify `--remove`.
+
+The VM is ready to be used.
+
+## Useful commands
+
+This section shows what commands could be used inside the VM that has been
+installed.
+
+### Generating an image
+
+A wrapper script is generated during the configure phase which allows you to
+invoke nodepool. The wrapper script also exports a `NODEPOOL_SSH_KEY` variable
+to the process. Environment variables starting sith `NODEPOOL_` are injected
+to the environment of the node installation scripts.
+
+To update an image in `rax-iad` region:
+
+    osci-nodepool image-update rax-iad DEMO

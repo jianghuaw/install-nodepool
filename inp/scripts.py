@@ -1,6 +1,7 @@
 import argparse
 import StringIO
 import logging
+import yaml
 
 from inp import remote
 from inp import data
@@ -12,36 +13,75 @@ from inp.validation import file_access_issues, remote_system_access_issues, get_
 DEFAULT_NODEPOOL_REPO = 'https://github.com/citrix-openstack/nodepool.git'
 DEFAULT_NODEPOOL_BRANCH = 'master'
 DEFAULT_PORT = 22
+DEFAULT_MIN_READY = 8
 
 
-class NodepoolInstallEnv(object):
+def bashline(some_dict):
+    return ' '.join('{key}={value}'.format(key=key, value=value) for
+        key, value in some_dict.iteritems())
+
+
+class NodepoolEnv(object):
+    def __init__(self):
+        self.username = 'nodepool'
+        self.home = '/home/nodepool'
+        self.key_name = 'nodepool'
+
+    @property
+    def _env_dict(self):
+        return dict(
+            NODEPOOL_USER=self.username,
+            NODEPOOL_HOME_DIR=self.home,
+        )
+
+    @property
+    def bashline(self):
+        return bashline(self._env_dict)
+
+    def as_dict(self):
+        return self._env_dict
+
+
+class NodepoolInstallEnv(NodepoolEnv):
     def __init__(self, repo, branch):
-        self.username = username = 'nodepool'
-        self.home = home = '/home/{username}'.format(username=username)
-        self.venv = '{home}/env'.format(home=home)
-        self.sources = '{home}/src/nodepool'.format(home=home)
-        self.config_dir = '{home}/conf'.format(home=home)
-        self.logs = '{home}/logs'.format(home=home)
-        self.config_file = 'nodepool.yaml'
+        super(NodepoolInstallEnv, self).__init__()
         self.repo = repo
         self.branch = branch
 
     @property
-    def bashline(self):
-        env = dict(
+    def _env_dict(self):
+        env = super(NodepoolInstallEnv, self)._env_dict
+        return dict(
+            env,
             NODEPOOL_REPO=self.repo,
             NODEPOOL_BRANCH=self.branch,
-            NODEPOOL_USER=self.username,
-            NODEPOOL_HOME_DIR=self.home,
-            NODEPOOL_VENV_DIR=self.venv,
-            NODEPOOL_SRC_DIR=self.sources,
-            NODEPOOL_CFG_DIR=self.config_dir,
-            NODEPPOL_LOGS_DIR=self.logs,
-            NODEPOOL_CFG_BASENAME=self.config_file,
         )
 
-        return ' '.join('{key}={value}'.format(key=key, value=value) for
-            key, value in env.iteritems())
+
+class NodepoolConfigEnv(NodepoolEnv):
+
+    def __init__(self, openrc, image_name, min_ready, rackspace_password):
+        super(NodepoolConfigEnv, self).__init__()
+        self.project_config_url = (
+            'https://github.com/citrix-openstack/project-config')
+        self.project_config_branch = 'xenserver-ci'
+        self.openrc = openrc
+        self.image_name = image_name
+        self.min_ready = str(min_ready)
+        self.rackspace_password = rackspace_password
+
+    @property
+    def _env_dict(self):
+        env = super(NodepoolConfigEnv, self)._env_dict
+        return dict(
+            env,
+            PROJECT_CONFIG_URL=self.project_config_url,
+            PROJECT_CONFIG_BRANCH=self.project_config_branch,
+            IMAGE_NAME=self.image_name,
+            MIN_READY=self.min_ready,
+            RACKSPACE_PASSWORD=self.rackspace_password,
+            **self.openrc
+        )
 
 
 def parse_install_args():
@@ -94,6 +134,131 @@ def install():
         connection.run('%s bash install.sh' % env.bashline)
         connection.run('rm -f install.sh')
 
+
+class NovaCommands(object):
+    def __init__(self, config_env):
+        self.config_env = config_env
+
+    def _nova_cmd(self, region, cmd):
+        env = self.config_env
+
+        nova_env = dict(env.openrc, OS_REGION_NAME=region)
+        return 'sudo -u {user} /bin/sh -c "HOME={home} {nova_env} /opt/nodepool/env/bin/nova {cmd}"'.format(
+            user=env.username,
+            nova_env=bashline(nova_env),
+            home=env.home,
+            cmd=cmd,
+            region=region,
+        )
+
+    def keypair_show(self, region, name):
+        return self._nova_cmd(region, 'keypair-show {name}'.format(name=name))
+
+    def keypair_delete(self, region, name):
+        return self._nova_cmd(region, 'keypair-delete {name}'.format(name=name))
+
+    def keypair_add(self, region, name, path):
+        return self._nova_cmd(
+            region, 'keypair-add --pub-key {path} {name}'.format(
+                name=name,
+                path=path
+            )
+        )
+
+
+def image_provider_regions():
+    nodepool_config = yaml.load(data.nodepool_config(dict()))
+
+    used_providers = []
+    for target in nodepool_config['targets']:
+        for image in target['images']:
+            for provider in image['providers']:
+                used_providers.append(provider['name'])
+
+    regions = []
+    for provider in nodepool_config['providers']:
+        if provider['name'] in used_providers:
+            regions.append(provider['region-name'])
+
+    return regions
+
+
+def _parse_nodepool_configure_args():
+    parser = argparse.ArgumentParser(
+        description="Configure Nodepool on a remote machine")
+    parser.add_argument('username', help='Username to target host')
+    parser.add_argument('host', help='Target host')
+    parser.add_argument('openrc', help='OpenRc file to access the cloud')
+    parser.add_argument('image_name', help='Image name to be used')
+    parser.add_argument('nodepool_keyfile', help='SSH key to be used to prepare nodes')
+    parser.add_argument('jenkins_keyfile', help='SSH key to be used by jenkins')
+    parser.add_argument('rackspace_password', help='Rackspace password')
+    parser.add_argument(
+        '--port',
+        type=int,
+        default=DEFAULT_PORT,
+        help='SSH port to use (default: %s)' % DEFAULT_PORT
+    )
+    parser.add_argument(
+        '--min_ready',
+        type=int,
+        default=DEFAULT_MIN_READY,
+        help='Default number of min ready nodes (default: %s)' % DEFAULT_MIN_READY
+    )
+    return parser.parse_args()
+
+
+def _issues_for_nodepool_configure_args(args):
+    return (
+        remote_system_access_issues(args.username, args.host, args.port)
+        + file_access_issues(args.openrc)
+        + file_access_issues(args.nodepool_keyfile)
+        + file_access_issues(args.jenkins_keyfile)
+    )
+
+
+def nodepool_configure():
+    args = get_args_or_die(
+        _parse_nodepool_configure_args,
+        _issues_for_nodepool_configure_args
+    )
+
+    env = NodepoolConfigEnv(
+        get_params_or_die(args.openrc),
+        args.image_name,
+        args.min_ready,
+        args.rackspace_password,
+    )
+    nodepool_config_file = data.nodepool_config(env.as_dict())
+
+    with remote.connect(args.username, args.host, args.port) as connection:
+        connection.put(
+            data.install_script('nodepool_config.sh'),
+            'nodepool_config.sh'
+        )
+        connection.put(
+            nodepool_config_file,
+            'nodepool.yaml'
+        )
+
+        connection.put(
+            args.nodepool_keyfile,
+            'nodepool.priv'
+        )
+
+        connection.put(
+            args.jenkins_keyfile,
+            'jenkins.priv'
+        )
+
+        connection.run('%s bash nodepool_config.sh' % env.bashline)
+
+        connection.run('rm -f nodepool_config.sh')
+        connection.run('rm -f nodepool.yaml')
+        connection.run('rm -f nodepool.priv')
+        # copy ssh key
+        # add ssh key to cloud
+        # generate nodepool.yaml
 
 def parse_start_args():
     parser = argparse.ArgumentParser(description="Start Nodepool")
@@ -172,3 +337,81 @@ def osci_start():
         connection.sudo('service citrix-ci start')
         connection.sudo('service citrix-ci-gerritwatch start')
 
+
+def _parse_nodepool_upload_keys_args():
+    parser = argparse.ArgumentParser(
+        description="Upload a key to the cloud")
+    parser.add_argument('username', help='Username to target host')
+    parser.add_argument('host', help='Target host')
+    parser.add_argument('openrc', help='OpenRc file to access the cloud')
+    parser.add_argument(
+        '--remove',
+        action="store_true",
+        default=False,
+        help='OpenRc file to access the cloud'
+    )
+    parser.add_argument(
+        '--port',
+        type=int,
+        default=DEFAULT_PORT,
+        help='SSH port to use (default: %s)' % DEFAULT_PORT
+    )
+    return parser.parse_args()
+
+
+def _issues_for_nodepool_upload_keys_args(args):
+    return (
+        remote_system_access_issues(args.username, args.host, args.port)
+        + file_access_issues(args.openrc)
+    )
+
+
+def nodepool_upload_keys():
+    args = get_args_or_die(
+        _parse_nodepool_upload_keys_args,
+        _issues_for_nodepool_upload_keys_args
+    )
+
+    env = NodepoolConfigEnv(
+        get_params_or_die(args.openrc),
+        'ignored',
+        'ignored',
+        'ignored',
+    )
+    nodepool_config_file = data.nodepool_config(env.as_dict())
+    nova_commands = NovaCommands(env)
+
+    regions = image_provider_regions()
+
+    with remote.connect(args.username, args.host, args.port) as connection:
+        key_exists_in_regions = []
+        for region in regions:
+            result = connection.run(
+                nova_commands.keypair_show(region, env.key_name),
+                ignore_failures=True,
+            )
+            if result.succeeded:
+                key_exists_in_regions.append(region)
+
+        if key_exists_in_regions and not args.remove:
+            raise SystemExit(
+                'Keypair "{keypair}" already exists at regions: {regions}'
+                ' Please remove them manually or use --remove'.format(
+                    keypair=env.key_name,
+                    regions=','.join(key_exists_in_regions)
+                )
+            )
+
+        if args.remove:
+            for region in key_exists_in_regions:
+                connection.run(
+                    nova_commands.keypair_delete(region, env.key_name)
+                )
+
+        for region in regions:
+            result = connection.run(
+                nova_commands.keypair_add(
+                    region,
+                    env.key_name,
+                    '{home}/.ssh/id_rsa.pub'.format(home=env.home))
+            )

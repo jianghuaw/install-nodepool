@@ -11,46 +11,56 @@ sudo DEBIAN_FRONTEND=noninteractive apt-get install -qy \
 
 ######
 # Create a nodepool user
-sudo adduser --system \
+sudo adduser \
     --home $NODEPOOL_HOME_DIR \
     --disabled-password \
     --quiet \
     --gecos $NODEPOOL_USER \
     $NODEPOOL_USER
 
-function as_nodepool() {
-    sudo -u $NODEPOOL_USER bash -c "$1"
-}
+
+######
+# Create install directory
+sudo mkdir /opt/nodepool
+sudo virtualenv /opt/nodepool/env
 
 
 ######
-# Get nodepool sources
-as_nodepool "git clone \
+# Create config directory
+sudo mkdir /etc/nodepool
+
+
+######
+# Create pid directory
+sudo mkdir /var/run/nodepool
+
+
+######
+# Create log directory
+sudo mkdir /var/log/nodepool
+
+
+######
+# Check out sources
+sudo mkdir /opt/nodepool/src
+sudo git clone \
+    --quiet \
     $NODEPOOL_REPO --branch $NODEPOOL_BRANCH \
-    $NODEPOOL_SRC_DIR"
+    /opt/nodepool/src
 
 
 ######
-# Create virtual environment
-as_nodepool "virtualenv $NODEPOOL_VENV_DIR"
-
-function in_venv() {
-    as_nodepool "set +u && . $NODEPOOL_VENV_DIR/bin/activate && set -u && $1"
-}
-
-
-######
-# Install python requirements
-in_venv "pip install -U distribute"
-in_venv "cd $NODEPOOL_SRC_DIR && pip install -U -r requirements.txt"
-in_venv "cd $NODEPOOL_SRC_DIR && pip install ."
-in_venv "pip install python-novaclient rackspace-auth-openstack"
-
-
-######
-# Create config and logging dir
-as_nodepool "mkdir $NODEPOOL_CFG_DIR"
-as_nodepool "mkdir $NODEPPOL_LOGS_DIR"
+# Install binaries
+sudo bash << EOF
+set -ex
+. /opt/nodepool/env/bin/activate
+set -u
+cd /opt/nodepool/src
+pip install -U distribute
+pip install -U -r requirements.txt
+pip install .
+pip install python-novaclient rackspace-auth-openstack
+EOF
 
 
 ######
@@ -61,81 +71,6 @@ GRANT ALL ON nodepool.* TO 'nodepool'@'localhost';
 flush privileges;
 DBINIT
 
-
-sudo -u $NODEPOOL_USER tee $NODEPOOL_CFG_DIR/logging.conf << EOF
-[loggers]
-keys=root,nodepool,requests,image
-
-[handlers]
-keys=console,debug,normal,image
-
-[formatters]
-keys=simple
-
-[logger_root]
-level=WARNING
-handlers=console
-
-[logger_requests]
-level=WARNING
-handlers=debug,normal
-qualname=requests
-
-[logger_nodepool]
-level=DEBUG
-handlers=debug,normal
-qualname=nodepool
-
-[logger_image]
-level=INFO
-handlers=image
-qualname=nodepool.image.build
-propagate=0
-
-[handler_console]
-level=WARNING
-class=StreamHandler
-formatter=simple
-args=(sys.stdout,)
-
-[handler_debug]
-level=DEBUG
-class=logging.handlers.TimedRotatingFileHandler
-formatter=simple
-args=('$NODEPPOL_LOGS_DIR/debug.log', 'midnight', 1, 30,)
-
-[handler_normal]
-level=INFO
-class=logging.handlers.TimedRotatingFileHandler
-formatter=simple
-args=('$NODEPPOL_LOGS_DIR/nodepool.log', 'midnight', 1, 30,)
-
-[handler_image]
-level=INFO
-class=logging.handlers.TimedRotatingFileHandler
-formatter=simple
-args=('$NODEPPOL_LOGS_DIR/image.log', 'midnight', 1, 30,)
-
-[formatter_simple]
-format=%(asctime)s %(levelname)s %(name)s: %(message)s
-datefmt=
-EOF
-
-sudo tee /etc/init/nodepool.conf << NODEPOOLSTARTER
-start on runlevel [2345]
-stop on runlevel [016]
-
-setuid $NODEPOOL_USER
-
-chdir /
-
-script
-    export NODEPOOL_SSH_KEY="\$(cat $HOME/.ssh/nodepool.pub)"
-    $NODEPOOL_VENV_DIR/bin/python \\
-        $NODEPOOL_VENV_DIR/bin/nodepoold \\
-        -c $NODEPOOL_CFG_DIR/$NODEPOOL_CFG_BASENAME \\
-        -l $NODEPOOL_CFG_DIR/logging.conf \\
-        -p $NODEPOOL_HOME_DIR/nodepool.pid \\
-        -d
-end script
-NODEPOOLSTARTER
+sudo chmod -R g-w,o-w /etc/nodepool /opt/nodepool
+sudo chown -R $NODEPOOL_USER:nogroup /var/log/nodepool /var/run/nodepool
+sudo chmod -R g-w,o-w /var/log/nodepool /var/run/nodepool

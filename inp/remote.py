@@ -5,12 +5,14 @@ from fabric import operations
 from fabric import network as fabric_network
 
 
-def fabric_settings(username, host, port):
+def fabric_settings(username, host, port, ignore_failures=False):
+    warn_only = ignore_failures
     return fabric_api.settings(
         host_string=host,
         abort_on_prompts=True,
         port=port,
-        user=username)
+        user=username,
+        warn_only=warn_only)
 
 def check_connection(username, host, port):
     with fabric_settings(username, host, port):
@@ -31,22 +33,23 @@ class Connection(object):
         self.port = port
 
     def put(self, local_fname, remote_fname):
-        with self.settings():
+        with self.settings(False):
             operations.put(local_path=local_fname, remote_path=remote_fname)
 
     def disconnect(self):
         fabric_network.disconnect_all()
 
-    def settings(self):
-        return fabric_settings(self.username, self.host, self.port)
+    def settings(self, ignore_failures):
+        return fabric_settings(
+            self.username, self.host, self.port, ignore_failures)
 
-    def run(self, command):
-        with self.settings():
-            fabric_api.run(command)
+    def run(self, command, ignore_failures=False):
+        with self.settings(ignore_failures):
+            return fabric_api.run(command)
 
     def sudo(self, command):
-        with self.settings():
-            fabric_api.sudo(command)
+        with self.settings(False):
+            return fabric_api.sudo(command)
 
 
 @contextlib.contextmanager
