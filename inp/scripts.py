@@ -256,9 +256,8 @@ def nodepool_configure():
         connection.run('rm -f nodepool_config.sh')
         connection.run('rm -f nodepool.yaml')
         connection.run('rm -f nodepool.priv')
-        # copy ssh key
-        # add ssh key to cloud
-        # generate nodepool.yaml
+        connection.run('rm -f jenkins.priv')
+
 
 def parse_start_args():
     parser = argparse.ArgumentParser(description="Start Nodepool")
