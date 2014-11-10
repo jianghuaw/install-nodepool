@@ -22,7 +22,6 @@ sudo adduser \
 ######
 # Create install directory
 sudo mkdir /opt/nodepool
-sudo virtualenv /opt/nodepool/env
 
 
 ######
@@ -51,6 +50,7 @@ sudo git clone \
 
 ######
 # Install binaries
+sudo virtualenv /opt/nodepool/env
 sudo bash << EOF
 set -ex
 . /opt/nodepool/env/bin/activate
@@ -71,6 +71,8 @@ GRANT ALL ON nodepool.* TO 'nodepool'@'localhost';
 flush privileges;
 DBINIT
 
+######
+# Set rights
 sudo chmod -R g-w,o-w /etc/nodepool /opt/nodepool
 sudo chown -R $NODEPOOL_USER:nogroup /var/log/nodepool /var/run/nodepool
 sudo chmod -R g-w,o-w /var/log/nodepool /var/run/nodepool
