@@ -414,3 +414,42 @@ def nodepool_upload_keys():
                     env.key_name,
                     '{home}/.ssh/id_rsa.pub'.format(home=env.home))
             )
+
+
+def parse_update_args():
+    parser = argparse.ArgumentParser(description="Update Nodepool")
+    parser.add_argument('username', help='Username to target host')
+    parser.add_argument('host', help='Target host')
+    parser.add_argument(
+        '--port',
+        type=int,
+        default=DEFAULT_PORT,
+        help='SSH port to use (default: %s)' % DEFAULT_PORT
+    )
+    parser.add_argument(
+        '--nodepool_repo',
+        default=DEFAULT_NODEPOOL_REPO,
+        help='Nodepool repository (default: %s)' % DEFAULT_NODEPOOL_REPO,
+    )
+    parser.add_argument(
+        '--nodepool_branch',
+        default='master',
+        help='Nodepool branch (default: %s)' % DEFAULT_NODEPOOL_BRANCH,
+    )
+    return parser.parse_args()
+
+
+def issues_for_update_args(args):
+    return remote_system_access_issues(args.username, args.host, args.port)
+
+
+def nodepool_update():
+    args = get_args_or_die(parse_update_args, issues_for_update_args)
+
+    env = NodepoolInstallEnv(args.nodepool_repo, args.nodepool_branch)
+
+    with remote.connect(args.username, args.host, args.port) as connection:
+        connection.put(data.install_script('update.sh'), 'update.sh')
+        connection.run('%s bash update.sh' % env.bashline)
+        connection.run('rm -f update.sh')
+

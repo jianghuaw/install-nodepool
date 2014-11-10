@@ -77,6 +77,15 @@ fail. To remove the existing keys, specify `--remove`.
 
 The VM is ready to be used.
 
+### Update nodepool
+
+If you wanted to update the version of nodepool that you are running, update
+it with:
+
+    inp-nodepool-update --port 2424 ubuntu 127.0.0.1
+
+Use `--nodepool_repo` and `--nodepool_branch` to specify the target version.
+
 ## Useful commands
 
 This section shows what commands could be used inside the VM that has been
@@ -92,3 +101,5 @@ to the environment of the node installation scripts.
 To update an image in `rax-iad` region:
 
     osci-nodepool image-update rax-iad DEMO
+
+
