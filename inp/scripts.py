@@ -11,7 +11,7 @@ from inp.validation import file_access_issues, remote_system_access_issues, get_
 
 
 DEFAULT_NODEPOOL_REPO = 'https://github.com/citrix-openstack/nodepool.git'
-DEFAULT_NODEPOOL_BRANCH = 'master'
+DEFAULT_NODEPOOL_BRANCH = '2014-11'
 DEFAULT_PORT = 22
 DEFAULT_MIN_READY = 8
 
@@ -101,7 +101,7 @@ def parse_install_args():
     )
     parser.add_argument(
         '--nodepool_branch',
-        default='master',
+        default=DEFAULT_NODEPOOL_BRANCH,
         help='Nodepool branch (default: %s)' % DEFAULT_NODEPOOL_BRANCH,
     )
     return parser.parse_args()
@@ -170,10 +170,9 @@ def image_provider_regions():
     nodepool_config = yaml.load(data.nodepool_config(dict()))
 
     used_providers = []
-    for target in nodepool_config['targets']:
-        for image in target['images']:
-            for provider in image['providers']:
-                used_providers.append(provider['name'])
+    for label in nodepool_config['labels']:
+        for provider in label['providers']:
+            used_providers.append(provider['name'])
 
     regions = []
     for provider in nodepool_config['providers']:
@@ -433,7 +432,7 @@ def parse_update_args():
     )
     parser.add_argument(
         '--nodepool_branch',
-        default='master',
+        default=DEFAULT_NODEPOOL_BRANCH,
         help='Nodepool branch (default: %s)' % DEFAULT_NODEPOOL_BRANCH,
     )
     return parser.parse_args()

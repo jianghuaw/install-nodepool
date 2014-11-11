@@ -11,6 +11,15 @@ zmq-publishers:
 gearman-servers:
   - host: localhost
 
+labels:
+  - name: '$IMAGE_NAME'
+    image: '$IMAGE_NAME'
+    min-ready: $MIN_READY
+    providers:
+      - name: rax-iad
+      - name: rax-ord
+      - name: rax-dfw
+
 providers:
   - name: rax-iad
     region-name: 'IAD'
@@ -39,7 +48,6 @@ providers:
         shutoff-poll-count: 60
         shutoff-poll-interval: 10
         setup: 'prepare_node_xenserver.sh'
-        pre-snapshot-timeout: 300
         private-key: '$NODEPOOL_HOME_DIR/.ssh/jenkins'
   - name: rax-dfw
     region-name: 'DFW'
@@ -68,7 +76,6 @@ providers:
         shutoff-poll-count: 60
         shutoff-poll-interval: 10
         setup: 'prepare_node_xenserver.sh'
-        pre-snapshot-timeout: 300
         private-key: '$NODEPOOL_HOME_DIR/.ssh/jenkins'
   - name: rax-ord
     region-name: 'ORD'
@@ -97,7 +104,6 @@ providers:
         shutoff-poll-count: 60
         shutoff-poll-interval: 10
         setup: 'prepare_node_xenserver.sh'
-        pre-snapshot-timeout: 300
         private-key: '$NODEPOOL_HOME_DIR/.ssh/jenkins'
 
 targets:
@@ -106,10 +112,3 @@ targets:
       url: https://jenkins.example.org/
       user: fake
       apikey: fake
-    images:
-      - name: '$IMAGE_NAME'
-        min-ready: $MIN_READY
-        providers:
-          - name: rax-iad
-          - name: rax-ord
-          - name: rax-dfw
