@@ -13,7 +13,7 @@ from inp.validation import file_access_issues, remote_system_access_issues, get_
 DEFAULT_NODEPOOL_REPO = 'https://github.com/citrix-openstack/nodepool.git'
 DEFAULT_NODEPOOL_BRANCH = '2014-11'
 PROJECT_CONFIG_URL = 'https://github.com/citrix-openstack/project-config'
-PROJECT_CONFIG_BRANCH = 'xenserver-ci'
+PROJECT_CONFIG_BRANCH = '2014-11'
 DEFAULT_PORT = 22
 DEFAULT_MIN_READY = 8
 
