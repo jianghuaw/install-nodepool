@@ -12,6 +12,7 @@ from inp.validation import file_access_issues, remote_system_access_issues, get_
 
 DEFAULT_NODEPOOL_REPO = 'https://github.com/citrix-openstack/nodepool.git'
 DEFAULT_NODEPOOL_BRANCH = '2014-11'
+PROJECT_CONFIG_BRANCH = 'xenserver-ci'
 DEFAULT_PORT = 22
 DEFAULT_MIN_READY = 8
 
@@ -64,7 +65,7 @@ class NodepoolConfigEnv(NodepoolEnv):
         super(NodepoolConfigEnv, self).__init__()
         self.project_config_url = (
             'https://github.com/citrix-openstack/project-config')
-        self.project_config_branch = 'xenserver-ci'
+        self.project_config_branch = PROJECT_CONFIG_BRANCH
         self.openrc = openrc
         self.image_name = image_name
         self.min_ready = str(min_ready)
