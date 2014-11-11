@@ -54,7 +54,8 @@ To install nodepool (but not to start it yet!), you should do the following:
 
     inp-install --port 2424 ubuntu 127.0.0.1
 
-After this operation, you should be have startup files in place for nodepool.
+After this operation, nodepool is installed to the controller. To understand
+what has happened, take a look at [installscript.sh](inp/installscript.sh).
 
 ### Configure nodepool
 
@@ -70,6 +71,9 @@ need to specify the password for your rackspace account.
 Please note, that you can also specify `--min-ready` to specify the number of
 nodes to be baked. For demo purposes you might want to specify it as `1`.
 
+To understand what has happened, take a look at
+[nodepool_config.sh](inp/nodepool_config.sh).
+
 ### Set up cloud keys
 
 Now nodepool is configured, you need to upload your key to be used to the
@@ -82,7 +86,7 @@ fail. To remove the existing keys, specify `--remove`.
 
 The VM is ready to be used.
 
-### Update nodepool
+### Development: Update nodepool
 
 If you wanted to update the version of nodepool that you are running, update
 it with:
@@ -106,5 +110,3 @@ to the environment of the node installation scripts.
 To update an image in `rax-iad` region:
 
     osci-nodepool image-update rax-iad DEMO
-
-
