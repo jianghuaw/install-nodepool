@@ -9,6 +9,11 @@ directory cloned to `~/src/install-nodepool` then:
 
     pip install ~/somedir
 
+Alternatively you can install directly from github, for example to install
+the `2014-11` branch:
+
+    pip install git+git://github.com/citrix-openstack/install-nodepool.git@2014-11
+
 ## Usage
 
 To demonstrate an example installation, a VM will be used. This VM is
