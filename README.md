@@ -86,6 +86,26 @@ fail. To remove the existing keys, specify `--remove`.
 
 The VM is ready to be used.
 
+### Install osci
+
+OSCI is playing the role of jenkins. This component is responsible for many
+things, including:
+  - watching the gerrit stream for review requests
+  - starting tests
+  - uploading logs
+
+To install osci, use the following command:
+
+    inp-osci-install --port 2424 citrix_gerrit ubuntu 127.0.0.1 SWIFT_KEY
+
+Where `SWIFT_KEY` will be used to upload the logs to swift.
+
+### Update osci binaries
+
+To update the binaries, use the following command:
+
+    inp-osci-release --port 2424 ubuntu 127.0.0.1
+
 ### Development: Update nodepool
 
 If you wanted to update the version of nodepool that you are running, update

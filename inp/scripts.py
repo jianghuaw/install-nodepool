@@ -14,6 +14,8 @@ DEFAULT_NODEPOOL_REPO = 'https://github.com/citrix-openstack/nodepool.git'
 DEFAULT_NODEPOOL_BRANCH = '2014-11'
 PROJECT_CONFIG_URL = 'https://github.com/citrix-openstack/project-config'
 PROJECT_CONFIG_BRANCH = '2014-11'
+DEFAULT_OSCI_REPO = 'https://github.com/citrix-openstack/openstack-citrix-ci.git'
+DEFAULT_OSCI_BRANCH = '2014-11'
 DEFAULT_PORT = 22
 DEFAULT_MIN_READY = 8
 
@@ -21,6 +23,32 @@ DEFAULT_MIN_READY = 8
 def bashline(some_dict):
     return ' '.join('{key}={value}'.format(key=key, value=value) for
         key, value in some_dict.iteritems())
+
+
+class OSCIEnv(object):
+    def __init__(self, osci_repo, osci_branch, swift_api_key):
+        self.username = 'osci'
+        self.home = '/home/osci'
+        self.osci_repo = osci_repo
+        self.osci_branch = osci_branch
+        self.swift_api_key = swift_api_key
+
+    @property
+    def _env_dict(self):
+        return dict(
+            OSCI_USER=self.username,
+            OSCI_HOME_DIR=self.home,
+            OSCI_REPO=self.osci_repo,
+            OSCI_BRANCH=self.osci_branch,
+            SWIFT_API_KEY=self.swift_api_key,
+        )
+
+    @property
+    def bashline(self):
+        return bashline(self._env_dict)
+
+    def as_dict(self):
+        return self._env_dict
 
 
 class NodepoolEnv(object):
@@ -110,10 +138,6 @@ def parse_install_args():
 
 def issues_for_install_args(args):
     return remote_system_access_issues(args.username, args.host, args.port)
-
-
-def pubkey_for(privkey):
-    return privkey + '.pub'
 
 
 def get_params_or_die(cloud_parameters_file):
@@ -280,24 +304,33 @@ def start():
 
 def parse_osci_install_args():
     parser = argparse.ArgumentParser(description="Install OSCI")
-    parser.add_argument('private_key', help='Private key file')
+    parser.add_argument('gerrit_key', help='Private key file to be used'
+                        ' with gerrit')
     parser.add_argument('username', help='Username to target host')
     parser.add_argument('host', help='Target host')
-    parser.add_argument('params', help='OSCI settings file')
-    parser.add_argument('--image_name', default='xsdsvm', help='Image name to use')
-    parser.add_argument('--osci_repo',
-                        default='https://github.com/citrix-openstack/openstack-citrix-ci.git',
-                        help='OSCI repository')
-    parser.add_argument('--osci_branch',
-                        default='master',
-                        help='Nodepool branch')
+    parser.add_argument('swift_api_key', help='Swift API key')
+    parser.add_argument(
+        '--osci_repo',
+        default=DEFAULT_OSCI_REPO,
+        help='OSCI repository (default: %s)' % DEFAULT_OSCI_REPO
+    )
+    parser.add_argument(
+        '--osci_branch',
+        default=DEFAULT_OSCI_BRANCH,
+        help='OSCI branch (default: %s)' % DEFAULT_OSCI_BRANCH
+    )
+    parser.add_argument(
+        '--port',
+        type=int,
+        default=DEFAULT_PORT,
+        help='SSH port to use (default: %s)' % DEFAULT_PORT
+    )
     return parser.parse_args()
 
 
 def issues_for_osci_install_args(args):
     issues = (
-        file_access_issues(args.private_key)
-        + file_access_issues(pubkey_for(args.private_key))
+        file_access_issues(args.gerrit_key)
         + remote_system_access_issues(args.username, args.host, args.port)
     )
 
@@ -305,16 +338,69 @@ def issues_for_osci_install_args(args):
 
 
 def osci_install():
-    args = get_args_or_die(parse_osci_install_args, issues_for_osci_install_args)
+    args = get_args_or_die(
+        parse_osci_install_args,
+        issues_for_osci_install_args)
 
-    with remote.connect(args.username, args.host) as connection:
-        connection.put(args.private_key, '.ssh/citrix_gerrit')
-        connection.put(pubkey_for(args.private_key), '.ssh/citrix_gerrit.pub')
-        connection.run('chmod 0400 .ssh/citrix_gerrit')
-        connection.put(args.params, 'osci.config')
-        connection.put(data.install_script('osci_installscript.sh'), 'osci_installscript.sh')
-        connection.run('bash osci_installscript.sh "%s" "%s"' %
-                       (args.osci_repo, args.osci_branch))
+    env = OSCIEnv(args.osci_repo, args.osci_branch, args.swift_api_key)
+
+    with remote.connect(args.username, args.host, args.port) as connection:
+        connection.put(args.gerrit_key, 'gerrit.key')
+        connection.put(
+            data.install_script('osci_installscript.sh'),
+            'osci_installscript.sh'
+        )
+        connection.run(
+            '%s bash osci_installscript.sh' % env.bashline
+        )
+        connection.run(
+            'rm -f gerrit.key osci_installscript.sh')
+
+
+def parse_osci_release_args():
+    parser = argparse.ArgumentParser(description="Release OSCI")
+    parser.add_argument('username', help='Username to target host')
+    parser.add_argument('host', help='Target host')
+    parser.add_argument(
+        '--osci_repo',
+        default=DEFAULT_OSCI_REPO,
+        help='OSCI repository (default: %s)' % DEFAULT_OSCI_REPO
+    )
+    parser.add_argument(
+        '--osci_branch',
+        default=DEFAULT_OSCI_BRANCH,
+        help='OSCI branch (default: %s)' % DEFAULT_OSCI_BRANCH
+    )
+    parser.add_argument(
+        '--port',
+        type=int,
+        default=DEFAULT_PORT,
+        help='SSH port to use (default: %s)' % DEFAULT_PORT
+    )
+    return parser.parse_args()
+
+
+def issues_for_osci_release_args(args):
+    return remote_system_access_issues(args.username, args.host, args.port)
+
+
+def osci_release():
+    args = get_args_or_die(
+        parse_osci_release_args,
+        issues_for_osci_release_args)
+
+    env = OSCIEnv(args.osci_repo, args.osci_branch, 'IRRELEVANT')
+
+    with remote.connect(args.username, args.host, args.port) as connection:
+        connection.put(
+            data.install_script('osci_release.sh'),
+            'osci_release.sh'
+        )
+        connection.run(
+            '%s bash osci_release.sh' % env.bashline
+        )
+        connection.run(
+            'rm -f gerrit.key osci_release.sh')
 
 
 def parse_osci_start_args():

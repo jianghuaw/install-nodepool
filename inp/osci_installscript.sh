@@ -1,29 +1,47 @@
 set -eux
 
-OSCI_REPO="$1"
-OSCI_BRANCH="$2"
+THIS_FILE=$(readlink -f $0)
+THIS_DIR=$(dirname $THIS_FILE)
+
 
 ######
-# Update apt
-#sudo apt-get -qy update
-#sudo DEBIAN_FRONTEND=noninteractive apt-get install -qy git mysql-server libmysqlclient-dev g++ python-dev libzmq-dev python-pip < /dev/null
+# Create an osci user
+sudo adduser \
+    --home $OSCI_HOME_DIR \
+    --disabled-password \
+    --quiet \
+    --gecos $OSCI_USER \
+    $OSCI_USER
+
 
 ######
-# Download nodepool + config
-echo -e "Host github.com\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config
+# Create install directory
+sudo mkdir /opt/osci
 
-[ -e ~/src ] || mkdir ~/src
-cd ~/src
 
-git clone "$OSCI_REPO"
-(
-  cd openstack-citrix-ci
-  git checkout "$OSCI_BRANCH"
-  # Install requirements
-  sudo pip install -U -r requirements.txt
-  # and osci itself
-  sudo pip install -e .
-)
+######
+# Create config directory
+sudo mkdir /etc/osci
+
+
+######
+# Create pid directory
+sudo mkdir /var/run/osci
+
+
+######
+# Create log directory
+sudo mkdir /var/log/osci
+
+
+######
+# Check out sources
+sudo mkdir /opt/osci/src
+sudo git clone \
+    --quiet \
+    $OSCI_REPO --branch $OSCI_BRANCH \
+    /opt/osci/src
+
 
 ######
 # Create database
@@ -33,7 +51,36 @@ GRANT ALL ON openstack_ci.* TO 'nodepool'@'localhost';
 flush privileges;
 DBINIT
 
-osci-create-dbschema
+
+SOURCE_ENV=". /opt/osci/env/bin/activate"
+
+######
+# Install binaries
+sudo virtualenv /opt/osci/env
+sudo bash << EOF
+set -ex
+. /opt/osci/env/bin/activate
+set -u
+cd /opt/nodepool/src
+pip install -U -r requirements.txt
+pip install .
+
+cd /opt/osci/src
+pip install -U -r requirements.txt
+pip install .
+EOF
+
+
+######
+# Set rights
+sudo chmod -R g-w,o-w /etc/osci /opt/osci
+sudo chown -R $OSCI_USER:nogroup /var/log/osci /var/run/osci
+sudo chmod -R g-w,o-w /var/log/osci /var/run/osci
+
+######
+# Create Database Schema
+sudo -u $OSCI_USER -i bash -c "$SOURCE_ENV ; osci-create-dbschema"
+
 
 sudo tee /etc/init/citrix-ci.conf << CITRIXCISTARTER
 start on runlevel [2345]
@@ -42,8 +89,14 @@ stop on runlevel [016]
 respawn
 respawn limit 3 60
 
+setuid $OSCI_USER
+chdir $OSCI_HOME_DIR
+
 script
-start-stop-daemon --start --make-pidfile --pidfile /var/run/citrix-ci.pid --exec /bin/bash -- -c "/root/src/openstack-citrix-ci/citrix-ci.sh >> /var/log/citrix-ci.log 2>&1"
+start-stop-daemon --start --make-pidfile \\
+    --pidfile /var/run/osci/citrix-ci.pid \\
+    --exec /bin/bash -- -c "$SOURCE_ENV; /opt/osci/src/citrix-ci.sh \\
+    >> /var/log/osci/citrix-ci.log 2>&1"
 end script
 CITRIXCISTARTER
 
@@ -54,17 +107,29 @@ stop on runlevel [016]
 respawn
 respawn limit 3 60
 
+setuid $OSCI_USER
+chdir $OSCI_HOME_DIR
+
 script
-start-stop-daemon --start --make-pidfile --pidfile /var/run/citrix-ci-gerritwatch.pid --exec /bin/bash -- -c "/root/src/openstack-citrix-ci/citrix-ci-gerritwatch.sh >> /var/log/citrix-ci-gerritwatch.log 2>&1"
+start-stop-daemon --start --make-pidfile \\
+    --pidfile /var/run/osci/citrix-ci-gerritwatch.pid \\
+    --exec /bin/bash -- -c "$SOURCE_ENV; /opt/osci/src/citrix-ci-gerritwatch.sh \\
+    >> /var/log/osci/citrix-ci-gerritwatch.log 2>&1"
 end script
 GERRITWATCH
 
-if [ ! -e /root/.ssh/citrix_gerrit ]; then
-    [ -e /root/.ssh ] || sudo mkdir /root/.ssh
-    sudo cp /root/.ssh/citrix_gerrit /root/.ssh/
-    sudo chmod 0400 /root/.ssh/citrix_gerrit
-    sudo chmod 0500 /root/.ssh
-fi
+
+######
+# Copy ssh settings
+sudo rm -rf $OSCI_HOME_DIR/.ssh
+sudo mkdir $OSCI_HOME_DIR/.ssh
+
+sudo cp $THIS_DIR/gerrit.key $OSCI_HOME_DIR/.ssh/gerrit
+sudo chown -R $OSCI_USER:$OSCI_USER $OSCI_HOME_DIR/.ssh
+sudo chmod -R g-w,g-r,o-w,o-r $OSCI_HOME_DIR/.ssh
+
+echo "JJJ -- TODO -- "
+exit 1
 
 # Add gerrit to known hosts: Mate's proxy (first) and then the real gerrit
 sudo tee -a /root/.ssh/known_hosts << KNOWN_HOST

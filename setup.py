@@ -12,8 +12,10 @@ setup(
             'installscript.sh',
             'nodepool_config.sh',
             'osci_installscript.sh',
+            'osci_release.sh',
             'update.sh',
-            'nodepool.yaml'],
+            'nodepool.yaml',
+            'osci.config'],
     },
     entry_points = {
         'console_scripts': [
@@ -23,6 +25,7 @@ setup(
             'inp-nodepool-update = inp.scripts:nodepool_update',
             'inp-start = inp.scripts:start',
             'inp-osci-install = inp.scripts:osci_install',
+            'inp-osci-release = inp.scripts:osci_release',
             'inp-osci-start = inp.scripts:osci_start',
         ]
     }
