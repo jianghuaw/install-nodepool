@@ -157,7 +157,7 @@ sudo ln -s -t /usr/local/bin /opt/osci/env/bin/osci-view
 
 ######
 # Skip uploading status for now
-touch /etc/osci/skip_status_update
+sudo touch /etc/osci/skip_status_update
 
 ######
 # Schedule status upload
