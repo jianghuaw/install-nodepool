@@ -93,9 +93,7 @@ setuid $OSCI_USER
 chdir $OSCI_HOME_DIR
 
 script
-start-stop-daemon --start --make-pidfile \\
-    --pidfile /var/run/osci/citrix-ci.pid \\
-    --exec /bin/bash -- -c "$SOURCE_ENV; /opt/osci/src/citrix-ci.sh \\
+    $SOURCE_ENV && osci-manage -v \\
     >> /var/log/osci/citrix-ci.log 2>&1"
 end script
 CITRIXCISTARTER
@@ -111,7 +109,8 @@ setuid $OSCI_USER
 chdir $OSCI_HOME_DIR
 
 script
-    $SOURCE_ENV && osci-watch-gerrit >> /var/log/osci/citrix-ci-gerritwatch.log 2>&1
+    $SOURCE_ENV && osci-watch-gerrit \\
+    >> /var/log/osci/citrix-ci-gerritwatch.log 2>&1
 end script
 GERRITWATCH
 
@@ -143,11 +142,8 @@ KEEP_FAILED=2
 PROJECT_CONFIG=openstack/nova,openstack/tempest,openstack-dev/devstack,stackforge/xenapi-os-testing
 NODE_KEY=$OSCI_HOME_DIR/.ssh/jenkins
 SWIFT_API_KEY=$SWIFT_API_KEY
+NODEPOOL_IMAGE=$IMAGE_NAME
 OSCI_CONF_END
-
-######
-# LINK BINARIES
-sudo ln -s -t /usr/local/bin /opt/osci/env/bin/osci-*
 
 ######
 # Add gerrit to known hosts:

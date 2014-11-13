@@ -27,12 +27,13 @@ def bashline(some_dict):
 
 
 class OSCIEnv(object):
-    def __init__(self, osci_repo, osci_branch, swift_api_key):
+    def __init__(self, osci_repo, osci_branch, swift_api_key, image_name):
         self.username = 'osci'
         self.home = '/home/osci'
         self.osci_repo = osci_repo
         self.osci_branch = osci_branch
         self.swift_api_key = swift_api_key
+        self.image_name = image_name
 
     @property
     def _env_dict(self):
@@ -43,6 +44,7 @@ class OSCIEnv(object):
             OSCI_BRANCH=self.osci_branch,
             SWIFT_API_KEY=self.swift_api_key,
             NODEPOOL_HOME_DIR=NODEPOOL_HOME_DIR,
+            IMAGE_NAME=self.image_name,
         )
 
     @property
@@ -311,6 +313,7 @@ def parse_osci_install_args():
     parser.add_argument('username', help='Username to target host')
     parser.add_argument('host', help='Target host')
     parser.add_argument('swift_api_key', help='Swift API key')
+    parser.add_argument('image_name', help='Image to be used')
     parser.add_argument(
         '--osci_repo',
         default=DEFAULT_OSCI_REPO,
@@ -344,7 +347,8 @@ def osci_install():
         parse_osci_install_args,
         issues_for_osci_install_args)
 
-    env = OSCIEnv(args.osci_repo, args.osci_branch, args.swift_api_key)
+    env = OSCIEnv(
+        args.osci_repo, args.osci_branch, args.swift_api_key, args.image_name)
 
     with remote.connect(args.username, args.host, args.port) as connection:
         connection.put(args.gerrit_key, 'gerrit.key')
@@ -391,7 +395,8 @@ def osci_release():
         parse_osci_release_args,
         issues_for_osci_release_args)
 
-    env = OSCIEnv(args.osci_repo, args.osci_branch, 'IRRELEVANT')
+    env = OSCIEnv(
+        args.osci_repo, args.osci_branch, 'IRRELEVANT', 'IRRELEVANT')
 
     with remote.connect(args.username, args.host, args.port) as connection:
         connection.put(
