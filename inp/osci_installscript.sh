@@ -111,10 +111,7 @@ setuid $OSCI_USER
 chdir $OSCI_HOME_DIR
 
 script
-start-stop-daemon --start --make-pidfile \\
-    --pidfile /var/run/osci/citrix-ci-gerritwatch.pid \\
-    --exec /bin/bash -- -c "$SOURCE_ENV; /opt/osci/src/citrix-ci-gerritwatch.sh \\
-    >> /var/log/osci/citrix-ci-gerritwatch.log 2>&1"
+    $SOURCE_ENV && osci-watch-gerrit >> /var/log/osci/citrix-ci-gerritwatch.log 2>&1"
 end script
 GERRITWATCH
 
@@ -124,10 +121,13 @@ GERRITWATCH
 sudo rm -rf $OSCI_HOME_DIR/.ssh
 sudo mkdir $OSCI_HOME_DIR/.ssh
 
-sudo cp $NODEPOOL_HOME/.ssh/jenkins $OSCI_HOME_DIR/.ssh/jenkins
+sudo cp $NODEPOOL_HOME_DIR/.ssh/jenkins $OSCI_HOME_DIR/.ssh/jenkins
 sudo cp $THIS_DIR/gerrit.key $OSCI_HOME_DIR/.ssh/gerrit
 sudo chown -R $OSCI_USER:$OSCI_USER $OSCI_HOME_DIR/.ssh
 sudo chmod -R g-w,g-r,o-w,o-r $OSCI_HOME_DIR/.ssh
+
+GERRIT_HOST=23.253.232.87
+
 
 sudo tee /etc/osci/osci.config << OSCI_CONF_END
 RUN_TESTS=True
@@ -135,7 +135,7 @@ VOTE=False
 VOTE_PASSED_ONLY=True
 VOTE_SERVICE_ACCOUNT=False
 MYSQL_USERNAME=nodepool
-GERRIT_HOST=23.253.232.87
+GERRIT_HOST=$GERRIT_HOST
 RECHECK_REGEXP=.*(citrix recheck|xenserver:? recheck|recheck xenserver).*
 KEEP_FAILED=2
 PROJECT_CONFIG=openstack/nova,openstack/tempest,openstack-dev/devstack,stackforge/xenapi-os-testing
@@ -144,11 +144,17 @@ SWIFT_API_KEY=$SWIFT_API_KEY
 OSCI_CONF_END
 
 ######
-# Link binaries
+# LINK BINARIES
 sudo ln -s -t /usr/local/bin /opt/osci/env/bin/osci-*
+
+######
+# Add gerrit to known hosts:
+sudo -u osci -i /bin/bash -c "ssh-keyscan -H -t rsa -p 29418 $GERRIT_HOST > ~/.ssh/known_hosts"
 
 echo "JJJ -- TODO -- "
 exit 1
+ssh-keyscan 23.253.232.87 > ~/.ssh/known_hosts
+ssh-keyscan -p 29418 23.253.232.87 > ~/.ssh/known_hosts
 
 # Add gerrit to known hosts: Mate's proxy (first) and then the real gerrit
 sudo tee -a /root/.ssh/known_hosts << KNOWN_HOST
