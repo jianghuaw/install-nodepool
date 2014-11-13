@@ -130,3 +130,11 @@ to the environment of the node installation scripts.
 To update an image in `rax-iad` region:
 
     osci-nodepool image-update rax-iad DEMO
+
+### Checking osci's connection to an instance
+
+This command requires that you already created a node with nodepool. Once
+`osci-nodepool list` returns with an IP address, you can try to connect to
+that with:
+
+    osci-check-connection exec 162.242.252.142

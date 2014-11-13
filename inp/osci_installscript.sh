@@ -124,9 +124,19 @@ GERRITWATCH
 sudo rm -rf $OSCI_HOME_DIR/.ssh
 sudo mkdir $OSCI_HOME_DIR/.ssh
 
+sudo cp $NODEPOOL_HOME/.ssh/jenkins $OSCI_HOME_DIR/.ssh/jenkins
 sudo cp $THIS_DIR/gerrit.key $OSCI_HOME_DIR/.ssh/gerrit
 sudo chown -R $OSCI_USER:$OSCI_USER $OSCI_HOME_DIR/.ssh
 sudo chmod -R g-w,g-r,o-w,o-r $OSCI_HOME_DIR/.ssh
+
+sudo tee /etc/osci/osci.config << OSCI_CONF_END
+NODE_KEY=$OSCI_HOME_DIR/.ssh/jenkins
+SWIFT_API_KEY=$SWIFT_API_KEY
+OSCI_CONF_END
+
+######
+# Link binaries
+sudo ln -s -t /usr/local/bin /opt/osci/env/bin/osci-*
 
 echo "JJJ -- TODO -- "
 exit 1

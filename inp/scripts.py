@@ -18,6 +18,7 @@ DEFAULT_OSCI_REPO = 'https://github.com/citrix-openstack/openstack-citrix-ci.git
 DEFAULT_OSCI_BRANCH = '2014-11'
 DEFAULT_PORT = 22
 DEFAULT_MIN_READY = 8
+NODEPOOL_HOME_DIR = '/home/nodepool'
 
 
 def bashline(some_dict):
@@ -41,6 +42,7 @@ class OSCIEnv(object):
             OSCI_REPO=self.osci_repo,
             OSCI_BRANCH=self.osci_branch,
             SWIFT_API_KEY=self.swift_api_key,
+            NODEPOOL_HOME_DIR=NODEPOOL_HOME_DIR,
         )
 
     @property
@@ -54,7 +56,7 @@ class OSCIEnv(object):
 class NodepoolEnv(object):
     def __init__(self):
         self.username = 'nodepool'
-        self.home = '/home/nodepool'
+        self.home = NODEPOOL_HOME_DIR
         self.key_name = 'nodepool'
 
     @property
