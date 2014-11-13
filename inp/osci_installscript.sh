@@ -111,7 +111,7 @@ setuid $OSCI_USER
 chdir $OSCI_HOME_DIR
 
 script
-    $SOURCE_ENV && osci-watch-gerrit >> /var/log/osci/citrix-ci-gerritwatch.log 2>&1"
+    $SOURCE_ENV && osci-watch-gerrit >> /var/log/osci/citrix-ci-gerritwatch.log 2>&1
 end script
 GERRITWATCH
 
@@ -122,11 +122,12 @@ sudo rm -rf $OSCI_HOME_DIR/.ssh
 sudo mkdir $OSCI_HOME_DIR/.ssh
 
 sudo cp $NODEPOOL_HOME_DIR/.ssh/jenkins $OSCI_HOME_DIR/.ssh/jenkins
-sudo cp $THIS_DIR/gerrit.key $OSCI_HOME_DIR/.ssh/gerrit
+sudo cp $THIS_DIR/gerrit.key $OSCI_HOME_DIR/.ssh/id_rsa
 sudo chown -R $OSCI_USER:$OSCI_USER $OSCI_HOME_DIR/.ssh
 sudo chmod -R g-w,g-r,o-w,o-r $OSCI_HOME_DIR/.ssh
 
 GERRIT_HOST=23.253.232.87
+GERRIT_PORT=29418
 
 
 sudo tee /etc/osci/osci.config << OSCI_CONF_END
@@ -136,6 +137,7 @@ VOTE_PASSED_ONLY=True
 VOTE_SERVICE_ACCOUNT=False
 MYSQL_USERNAME=nodepool
 GERRIT_HOST=$GERRIT_HOST
+GERRIT_PORT=$GERRIT_PORT
 RECHECK_REGEXP=.*(citrix recheck|xenserver:? recheck|recheck xenserver).*
 KEEP_FAILED=2
 PROJECT_CONFIG=openstack/nova,openstack/tempest,openstack-dev/devstack,stackforge/xenapi-os-testing
@@ -149,18 +151,10 @@ sudo ln -s -t /usr/local/bin /opt/osci/env/bin/osci-*
 
 ######
 # Add gerrit to known hosts:
-sudo -u osci -i /bin/bash -c "ssh-keyscan -H -t rsa -p 29418 $GERRIT_HOST > ~/.ssh/known_hosts"
+sudo -u osci -i /bin/bash -c "ssh-keyscan -H -t rsa -p $GERRIT_PORT '$GERRIT_HOST [$GERRIT_HOST]:$GERRIT_PORT'> ~/.ssh/known_hosts"
 
 echo "JJJ -- TODO -- "
 exit 1
-ssh-keyscan 23.253.232.87 > ~/.ssh/known_hosts
-ssh-keyscan -p 29418 23.253.232.87 > ~/.ssh/known_hosts
-
-# Add gerrit to known hosts: Mate's proxy (first) and then the real gerrit
-sudo tee -a /root/.ssh/known_hosts << KNOWN_HOST
-|1|uvH7eZ2XTbkdHUUXZ3XBScp6SO0=|uYehq2EeLpZYm2+UJew0YUhzUSU= ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDtdLzDzG6qmejiZq5BxDqxkN71W08xuQWVZ+6784SpsXTUujKT49lNCXmH+IHijsRaigU9cVFkWErVez0Q+NtUe077c5s50zCrL7EwH5/aiwaYklHF566TO7ctOJBLLsoVOUlJGpUAjM4veG9XMz0KhTP9qYK3zqNOcPV++551bQu1rc3kR8R8C/etmP60zMhVkUAdgyPWFZbmKlrBv1SxIpvjSo5STZzSRS7DK5/D9BaWS3zOcl5Pqtv0FVjm83dmQJxMPEjFo8e0T4Gq/noxYafQse4811/Ucmxj8J5rlJchakfxJz827w3MWYR4Ku+X3QAy/deBuvzUn3z35Zwr
-|1|v64yXgSHd9wX62/OTnmu4O91rXo=|NkrM8t/1ZlyLl0NhSXWx8GkvjcU= ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDtdLzDzG6qmejiZq5BxDqxkN71W08xuQWVZ+6784SpsXTUujKT49lNCXmH+IHijsRaigU9cVFkWErVez0Q+NtUe077c5s50zCrL7EwH5/aiwaYklHF566TO7ctOJBLLsoVOUlJGpUAjM4veG9XMz0KhTP9qYK3zqNOcPV++551bQu1rc3kR8R8C/etmP60zMhVkUAdgyPWFZbmKlrBv1SxIpvjSo5STZzSRS7DK5/D9BaWS3zOcl5Pqtv0FVjm83dmQJxMPEjFo8e0T4Gq/noxYafQse4811/Ucmxj8J5rlJchakfxJz827w3MWYR4Ku+X3QAy/deBuvzUn3z35Zwr
-KNOWN_HOST
 
 # Add uploading of status to crontab
 crontab - <<EOF
