@@ -130,6 +130,15 @@ sudo chown -R $OSCI_USER:$OSCI_USER $OSCI_HOME_DIR/.ssh
 sudo chmod -R g-w,g-r,o-w,o-r $OSCI_HOME_DIR/.ssh
 
 sudo tee /etc/osci/osci.config << OSCI_CONF_END
+RUN_TESTS=True
+VOTE=False
+VOTE_PASSED_ONLY=True
+VOTE_SERVICE_ACCOUNT=False
+MYSQL_USERNAME=nodepool
+GERRIT_HOST=23.253.232.87
+RECHECK_REGEXP=.*(citrix recheck|xenserver:? recheck|recheck xenserver).*
+KEEP_FAILED=2
+PROJECT_CONFIG=openstack/nova,openstack/tempest,openstack-dev/devstack,stackforge/xenapi-os-testing
 NODE_KEY=$OSCI_HOME_DIR/.ssh/jenkins
 SWIFT_API_KEY=$SWIFT_API_KEY
 OSCI_CONF_END
