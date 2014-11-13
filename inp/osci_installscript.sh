@@ -155,10 +155,12 @@ sudo -u osci -i /bin/bash -c "ssh-keyscan -H -t rsa -p $GERRIT_PORT '$GERRIT_HOS
 # Create a link for osci-view
 sudo ln -s -t /usr/local/bin /opt/osci/env/bin/osci-view
 
-echo "JJJ -- TODO -- "
-exit 1
+######
+# Skip uploading status for now
+touch /etc/osci/skip_status_update
 
-# Add uploading of status to crontab
+######
+# Schedule status upload
 sudo crontab -u $OSCI_USER - <<EOF
-*/10 * * * * /opt/osci/src/upload_ci_status.sh
+*/10 * * * * /opt/osci/src/upload_ci_status.sh >> /var/log/osci/status_upload.log 2>&1
 EOF
