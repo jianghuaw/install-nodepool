@@ -546,3 +546,61 @@ def nodepool_update():
         connection.run('%s bash update.sh' % env.bashline)
         connection.run('rm -f update.sh')
 
+
+def parse_backup_args():
+    parser = argparse.ArgumentParser(description="Backup osci and nodepool")
+    parser.add_argument('username', help='Username to target host')
+    parser.add_argument('host', help='Target host')
+    parser.add_argument('output', help='Output file on local system')
+    parser.add_argument(
+        '--port',
+        type=int,
+        default=DEFAULT_PORT,
+        help='SSH port to use (default: %s)' % DEFAULT_PORT
+    )
+    return parser.parse_args()
+
+
+def issues_for_backup_args(args):
+    return remote_system_access_issues(args.username, args.host, args.port)
+
+
+def backup():
+    args = get_args_or_die(parse_backup_args, issues_for_backup_args)
+
+    with remote.connect(args.username, args.host, args.port) as connection:
+        connection.put(data.install_script('backup.sh'), 'backup.sh')
+        connection.run('bash backup.sh')
+        connection.get('osci-backup.tgz', args.output)
+        connection.run('rm -f backup.sh osci-backup.tgz')
+
+
+def parse_restore_args():
+    parser = argparse.ArgumentParser(description="Restore osci and nodepool")
+    parser.add_argument('username', help='Username to target host')
+    parser.add_argument('host', help='Target host')
+    parser.add_argument('dump_file', help='Dump file on local system')
+    parser.add_argument(
+        '--port',
+        type=int,
+        default=DEFAULT_PORT,
+        help='SSH port to use (default: %s)' % DEFAULT_PORT
+    )
+    return parser.parse_args()
+
+
+def issues_for_restore_args(args):
+    return (
+        remote_system_access_issues(args.username, args.host, args.port)
+        + file_access_issues(args.dump_file)
+    )
+
+
+def restore():
+    args = get_args_or_die(parse_restore_args, issues_for_restore_args)
+
+    with remote.connect(args.username, args.host, args.port) as connection:
+        connection.put(data.install_script('restore.sh'), 'restore.sh')
+        connection.put(args.dump_file, 'osci-backup.tgz')
+        connection.run('bash restore.sh')
+        connection.run('rm -f restore.sh osci-backup.tgz')

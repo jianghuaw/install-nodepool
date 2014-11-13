@@ -36,6 +36,10 @@ class Connection(object):
         with self.settings(False):
             operations.put(local_path=local_fname, remote_path=remote_fname)
 
+    def get(self, remote_fname, local_fname):
+        with self.settings(False):
+            operations.get(local_path=local_fname, remote_path=remote_fname)
+
     def disconnect(self):
         fabric_network.disconnect_all()
 

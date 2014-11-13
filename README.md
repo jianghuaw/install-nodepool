@@ -96,15 +96,28 @@ things, including:
 
 To install osci, use the following command:
 
-    inp-osci-install --port 2424 citrix_gerrit ubuntu 127.0.0.1 SWIFT_KEY
+    inp-osci-install --port 2424 citrix_gerrit ubuntu 127.0.0.1 SWIFT_KEY DEMO
 
-Where `SWIFT_KEY` will be used to upload the logs to swift.
+Where `SWIFT_KEY` will be used to upload the logs to swift, and `DEMO` is the
+image name to be used.
 
 ### Update osci binaries
 
 To update the binaries, use the following command:
 
     inp-osci-release --port 2424 ubuntu 127.0.0.1
+
+### Backup databases
+
+To save a backup of all the databases to the file `backup.tgz`:
+
+    inp-osci-backup --port 2424 ubuntu 127.0.0.1 backup.tgz
+
+### Restore database
+
+To restore the database from the local file `backup.tgz`, use:
+
+    inp-osci-restore --port 2424 ubuntu 127.0.0.1 backup.tgz
 
 ### Development: Update nodepool
 

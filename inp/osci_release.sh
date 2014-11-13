@@ -29,6 +29,8 @@ pip install .
 cd /opt/osci/src
 pip install -U -r requirements.txt
 pip install .
+
+pip install -U requests==2.2.0
 EOF
 
 

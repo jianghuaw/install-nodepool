@@ -68,6 +68,8 @@ pip install .
 cd /opt/osci/src
 pip install -U -r requirements.txt
 pip install .
+
+pip install -U requests==2.2.0
 EOF
 
 
@@ -94,7 +96,7 @@ chdir $OSCI_HOME_DIR
 
 script
     $SOURCE_ENV && osci-manage -v \\
-    >> /var/log/osci/citrix-ci.log 2>&1"
+    >> /var/log/osci/citrix-ci.log 2>&1
 end script
 CITRIXCISTARTER
 
@@ -149,10 +151,14 @@ OSCI_CONF_END
 # Add gerrit to known hosts:
 sudo -u osci -i /bin/bash -c "ssh-keyscan -H -t rsa -p $GERRIT_PORT '$GERRIT_HOST [$GERRIT_HOST]:$GERRIT_PORT'> ~/.ssh/known_hosts"
 
+######
+# Create a link for osci-view
+sudo ln -s -t /usr/local/bin /opt/osci/env/bin/osci-view
+
 echo "JJJ -- TODO -- "
 exit 1
 
 # Add uploading of status to crontab
-crontab - <<EOF
-*/10 * * * * /root/src/openstack-citrix-ci/upload_ci_status.sh
+sudo crontab -u $OSCI_USER - <<EOF
+*/10 * * * * /opt/osci/src/upload_ci_status.sh
 EOF

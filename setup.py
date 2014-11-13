@@ -15,7 +15,9 @@ setup(
             'osci_release.sh',
             'update.sh',
             'nodepool.yaml',
-            'osci.config'],
+            'osci.config',
+            'backup.sh',
+            'restore.sh'],
     },
     entry_points = {
         'console_scripts': [
@@ -27,6 +29,8 @@ setup(
             'inp-osci-install = inp.scripts:osci_install',
             'inp-osci-release = inp.scripts:osci_release',
             'inp-osci-start = inp.scripts:osci_start',
+            'inp-osci-backup = inp.scripts:backup',
+            'inp-osci-restore = inp.scripts:restore',
         ]
     }
 )
