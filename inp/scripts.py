@@ -59,7 +59,6 @@ class NodepoolEnv(object):
     def __init__(self):
         self.username = 'nodepool'
         self.home = NODEPOOL_HOME_DIR
-        self.key_name = 'nodepool'
 
     @property
     def _env_dict(self):
@@ -102,6 +101,7 @@ class NodepoolConfigEnv(NodepoolEnv):
         self.image_name = image_name
         self.min_ready = str(min_ready)
         self.rackspace_password = rackspace_password
+        self.key_name = 'nodepool'
 
     @property
     def _env_dict(self):
