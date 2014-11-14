@@ -114,6 +114,8 @@ script
     $SOURCE_ENV && osci-watch-gerrit \\
     >> /var/log/osci/citrix-ci-gerritwatch.log 2>&1
 end script
+
+post-stop exec sleep 10
 GERRITWATCH
 
 
