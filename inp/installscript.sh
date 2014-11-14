@@ -6,7 +6,8 @@ sudo apt-get -qy update
 sudo DEBIAN_FRONTEND=noninteractive apt-get install -qy \
     git mysql-server libmysqlclient-dev g++ python-dev libzmq-dev \
     python-pip python-virtualenv \
-    gearman-job-server libffi-dev libssl-dev < /dev/null
+    gearman-job-server libffi-dev libssl-dev \
+    git < /dev/null
 
 
 ######
