@@ -18,6 +18,7 @@ DEFAULT_OSCI_REPO = 'https://github.com/citrix-openstack/openstack-citrix-ci.git
 DEFAULT_OSCI_BRANCH = '2014-11'
 DEFAULT_PORT = 22
 DEFAULT_MIN_READY = 8
+DEFAULT_KEYPAIR_NAME = 'nodepool'
 NODEPOOL_HOME_DIR = '/home/nodepool'
 
 
@@ -93,7 +94,7 @@ class NodepoolInstallEnv(NodepoolEnv):
 
 class NodepoolConfigEnv(NodepoolEnv):
 
-    def __init__(self, openrc, image_name, min_ready, rackspace_password):
+    def __init__(self, openrc, image_name, min_ready, rackspace_password, key_name):
         super(NodepoolConfigEnv, self).__init__()
         self.project_config_url = PROJECT_CONFIG_URL
         self.project_config_branch = PROJECT_CONFIG_BRANCH
@@ -101,7 +102,7 @@ class NodepoolConfigEnv(NodepoolEnv):
         self.image_name = image_name
         self.min_ready = str(min_ready)
         self.rackspace_password = rackspace_password
-        self.key_name = 'nodepool'
+        self.key_name = key_name
 
     @property
     def _env_dict(self):
@@ -113,6 +114,7 @@ class NodepoolConfigEnv(NodepoolEnv):
             IMAGE_NAME=self.image_name,
             MIN_READY=self.min_ready,
             RACKSPACE_PASSWORD=self.rackspace_password,
+            NODEPOOL_KEYPAIR_NAME=self.key_name,
             **self.openrc
         )
 
@@ -233,6 +235,11 @@ def _parse_nodepool_configure_args():
         default=DEFAULT_MIN_READY,
         help='Default number of min ready nodes (default: %s)' % DEFAULT_MIN_READY
     )
+    parser.add_argument(
+        '--key_name',
+        default=DEFAULT_KEYPAIR_NAME,
+        help='Keypair name to use (default: %s)' % DEFAULT_KEYPAIR_NAME
+    )
     return parser.parse_args()
 
 
@@ -256,6 +263,7 @@ def nodepool_configure():
         args.image_name,
         args.min_ready,
         args.rackspace_password,
+        args.key_name,
     )
     nodepool_config_file = data.nodepool_config(env.as_dict())
 
@@ -448,6 +456,11 @@ def _parse_nodepool_upload_keys_args():
         default=DEFAULT_PORT,
         help='SSH port to use (default: %s)' % DEFAULT_PORT
     )
+    parser.add_argument(
+        '--key_name',
+        default=DEFAULT_KEYPAIR_NAME,
+        help='Keypair name to use (default: %s)' % DEFAULT_KEYPAIR_NAME
+    )
     return parser.parse_args()
 
 
@@ -469,6 +482,7 @@ def nodepool_upload_keys():
         'ignored',
         'ignored',
         'ignored',
+        args.key_name,
     )
     nodepool_config_file = data.nodepool_config(env.as_dict())
     nova_commands = NovaCommands(env)

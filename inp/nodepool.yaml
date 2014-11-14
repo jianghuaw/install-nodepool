@@ -31,7 +31,7 @@ providers:
     auth-url: '$OS_AUTH_URL'
     boot-timeout: 60
     max-servers: 25
-    keypair: nodepool
+    keypair: $NODEPOOL_KEYPAIR_NAME
     images:
       - name: '$IMAGE_NAME'
         base-image: '62df001e-87ee-407c-b042-6f4e13f5d7e1'
@@ -59,7 +59,7 @@ providers:
     auth-url: '$OS_AUTH_URL'
     boot-timeout: 60
     max-servers: 10
-    keypair: nodepool
+    keypair: $NODEPOOL_KEYPAIR_NAME
     images:
       - name: '$IMAGE_NAME'
         base-image: '62df001e-87ee-407c-b042-6f4e13f5d7e1'
@@ -87,7 +87,7 @@ providers:
     auth-url: '$OS_AUTH_URL'
     boot-timeout: 60
     max-servers: 14
-    keypair: nodepool
+    keypair: $NODEPOOL_KEYPAIR_NAME
     images:
       - name: '$IMAGE_NAME'
         base-image: '62df001e-87ee-407c-b042-6f4e13f5d7e1'
