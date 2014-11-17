@@ -105,6 +105,7 @@ chdir $NODEPOOL_HOME_DIR
 
 script
     export NODEPOOL_SSH_KEY="\$(cat $NODEPOOL_HOME_DIR/.ssh/jenkins.pub | cut -d' ' -f 2)"
+    export NODEPOOL_PYPI_REPO="http://pypi.python.org/simple"
     /opt/nodepool/env/bin/python \\
         /opt/nodepool/env/bin/nodepoold \\
         -l /etc/nodepool/logging.conf \\
@@ -133,6 +134,7 @@ sudo tee /usr/local/bin/osci-nodepool << EOF
 #!/bin/bash
 sudo -u $NODEPOOL_USER -i \\
     NODEPOOL_SSH_KEY="\$(cat $NODEPOOL_HOME_DIR/.ssh/jenkins.pub | cut -d' ' -f 2)" \\
+    NODEPOOL_PYPI_REPO="http://pypi.python.org/simple" \\
     /opt/nodepool/env/bin/nodepool "\$@"
 EOF
 
