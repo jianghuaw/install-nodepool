@@ -150,4 +150,6 @@ This command requires that you already created a node with nodepool. Once
 `osci-nodepool list` returns with an IP address, you can try to connect to
 that with:
 
+    sudo -u osci -i
+    . /opt/osci/env/bin/activate
     osci-check-connection exec 162.242.252.142
