@@ -33,6 +33,7 @@ setup(
             'inp-osci-stop = inp.scripts:osci_stop',
             'inp-osci-backup = inp.scripts:backup',
             'inp-osci-restore = inp.scripts:restore',
+            'inp-ci-status = inp.scripts:ci_status',
         ]
     }
 )

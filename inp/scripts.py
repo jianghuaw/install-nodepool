@@ -372,6 +372,21 @@ def nodepool_stop():
         connection.sudo('service nodepool stop')
 
 
+def parse_ci_status_args():
+    parser = argparse.ArgumentParser(description="Query the status of CI")
+    return _parse_startstop_args(parser)
+
+
+def ci_status():
+    args = get_args_or_die(
+        parse_ci_status_args,
+        system_access_issues)
+
+    with remote.connect(args.username, args.host, args.port) as connection:
+        connection.quiet = True
+        print connection.run('initctl list | grep -e citrix -e nodepool')
+
+
 def parse_osci_install_args():
     parser = argparse.ArgumentParser(description="Install OSCI")
     parser.add_argument('gerrit_key', help='Private key file to be used'
