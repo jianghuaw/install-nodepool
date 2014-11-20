@@ -1,15 +1,13 @@
 set -eux
 
 ######
-# Stop nodepool
-sudo service nodepool stop || true
-sleep 5
+# Make sure nodepool is stopped
 service nodepool status | grep -q "stop/waiting"
 
 
 ######
 # Backup actual version
-sudo tar -czf $NODEPOOL_HOME_DIR/binaries.tgz -C /opt/nodepool env src
+sudo tar -czf $NODEPOOL_HOME_DIR/nodepool-backup.tgz -C /opt/nodepool env src
 
 
 ######
@@ -41,7 +39,5 @@ pip install python-novaclient rackspace-auth-openstack
 EOF
 
 ######
-# Set rights
-sudo chmod -R g-w,o-w /etc/nodepool /opt/nodepool
-sudo chown -R $NODEPOOL_USER:nogroup /var/log/nodepool /var/run/nodepool
-sudo chmod -R g-w,o-w /var/log/nodepool /var/run/nodepool
+# Adjust rights
+sudo chmod -R g-w,o-w /opt/nodepool
