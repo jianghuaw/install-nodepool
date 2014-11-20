@@ -446,22 +446,28 @@ def osci_release():
 
 def parse_osci_start_args():
     parser = argparse.ArgumentParser(description="Start OSCI")
-    parser.add_argument('username', help='Username to target host')
-    parser.add_argument('host', help='Target host')
-    return parser.parse_args()
-
-
-def issues_for_osci_start_args(args):
-    issues = remote_system_access_issues(args.username, args.host, args.port)
-    return issues
+    return _parse_startstop_args(parser)
 
 
 def osci_start():
-    args = get_args_or_die(parse_osci_start_args, issues_for_osci_start_args)
+    args = get_args_or_die(parse_osci_start_args, system_access_issues)
 
-    with remote.connect(args.username, args.host) as connection:
+    with remote.connect(args.username, args.host, args.port) as connection:
         connection.sudo('service citrix-ci start')
         connection.sudo('service citrix-ci-gerritwatch start')
+
+
+def parse_osci_stop_args():
+    parser = argparse.ArgumentParser(description="Stop OSCI")
+    return _parse_startstop_args(parser)
+
+
+def osci_stop():
+    args = get_args_or_die(parse_osci_stop_args, system_access_issues)
+
+    with remote.connect(args.username, args.host, args.port) as connection:
+        connection.sudo('service citrix-ci stop')
+        connection.sudo('service citrix-ci-gerritwatch stop')
 
 
 def _parse_nodepool_upload_keys_args():
