@@ -340,7 +340,7 @@ def service_names(alias):
         yield alias
 
 
-def _parse_startstop_args(parser):
+def _parse_service_mgt_args(parser):
     parser.add_argument('username', help='Username to target host')
     parser.add_argument('host', help='Target host')
     parser.add_argument(
@@ -364,7 +364,7 @@ def system_access_issues(args):
 
 def parse_ci_status_args():
     parser = argparse.ArgumentParser(description="Query the status of CI")
-    return _parse_startstop_args(parser)
+    return _parse_service_mgt_args(parser)
 
 
 def ci_status():
@@ -491,7 +491,7 @@ def osci_release():
 
 def parse_osci_start_args():
     parser = argparse.ArgumentParser(description="Start an OSCI service")
-    return _parse_startstop_args(parser)
+    return _parse_service_mgt_args(parser)
 
 
 def osci_start():
@@ -504,7 +504,7 @@ def osci_start():
 
 def parse_osci_stop_args():
     parser = argparse.ArgumentParser(description="Stop an OSCI service")
-    return _parse_startstop_args(parser)
+    return _parse_service_mgt_args(parser)
 
 
 def osci_stop():
