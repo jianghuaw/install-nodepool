@@ -128,6 +128,18 @@ it with:
 
 Use `--nodepool_repo` and `--nodepool_branch` to specify the target version.
 
+### Start Nodepool
+
+To start the nodepool service on the remote system, use:
+
+    inp-nodepool-start --port 2424 ubuntu 127.0.0.1
+
+### Stop Nodepool
+
+To stop the nodepool service on the remote system, use:
+
+    inp-nodepool-stop --port 2424 ubuntu 127.0.0.1
+
 ## Useful commands
 
 This section shows what commands could be used inside the VM that has been

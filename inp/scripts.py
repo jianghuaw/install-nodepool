@@ -295,23 +295,49 @@ def nodepool_configure():
         connection.run('rm -f jenkins.priv')
 
 
-def parse_start_args():
-    parser = argparse.ArgumentParser(description="Start Nodepool")
+def _parse_startstop_args(parser):
     parser.add_argument('username', help='Username to target host')
     parser.add_argument('host', help='Target host')
+    parser.add_argument(
+        '--port',
+        type=int,
+        default=DEFAULT_PORT,
+        help='SSH port to use (default: %s)' % DEFAULT_PORT
+    )
     return parser.parse_args()
 
 
-def issues_for_start_args(args):
+def parse_nodepool_start_args():
+    parser = argparse.ArgumentParser(description="Start Nodepool")
+    return _parse_startstop_args(parser)
+
+
+def system_access_issues(args):
     issues = remote_system_access_issues(args.username, args.host, args.port)
     return issues
 
 
-def start():
-    args = get_args_or_die(parse_start_args, issues_for_start_args)
+def nodepool_start():
+    args = get_args_or_die(
+        parse_nodepool_start_args,
+        system_access_issues)
 
-    with remote.connect(args.username, args.host) as connection:
+    with remote.connect(args.username, args.host, args.port) as connection:
         connection.sudo('service nodepool start')
+
+
+def parse_nodepool_stop_args():
+    parser = argparse.ArgumentParser(description="Stop Nodepool")
+    return _parse_startstop_args(parser)
+
+
+def nodepool_stop():
+    args = get_args_or_die(
+        parse_nodepool_stop_args,
+        system_access_issues)
+
+    with remote.connect(args.username, args.host, args.port) as connection:
+        connection.sudo('service nodepool stop')
 
 
 def parse_osci_install_args():
