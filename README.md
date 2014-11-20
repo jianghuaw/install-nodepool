@@ -105,7 +105,7 @@ image name to be used.
 
 To update the binaries, use the following command:
 
-    inp-osci-release --port 2424 ubuntu 127.0.0.1
+    inp-osci-update --port 2424 ubuntu 127.0.0.1
 
 ### Backup databases
 

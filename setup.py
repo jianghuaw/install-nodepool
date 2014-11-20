@@ -26,7 +26,7 @@ setup(
             'inp-nodepool-configure = inp.scripts:nodepool_configure',
             'inp-nodepool-update = inp.scripts:nodepool_update',
             'inp-osci-install = inp.scripts:osci_install',
-            'inp-osci-release = inp.scripts:osci_release',
+            'inp-osci-update = inp.scripts:osci_release',
             'inp-osci-start = inp.scripts:osci_start',
             'inp-osci-stop = inp.scripts:osci_stop',
             'inp-osci-backup = inp.scripts:backup',

@@ -442,7 +442,7 @@ def osci_install():
             'rm -f gerrit.key osci_installscript.sh')
 
 
-def parse_osci_release_args():
+def parse_osci_update_args():
     parser = argparse.ArgumentParser(description="Release OSCI")
     parser.add_argument('username', help='Username to target host')
     parser.add_argument('host', help='Target host')
@@ -465,14 +465,14 @@ def parse_osci_release_args():
     return parser.parse_args()
 
 
-def issues_for_osci_release_args(args):
+def issues_for_osci_update_args(args):
     return remote_system_access_issues(args.username, args.host, args.port)
 
 
-def osci_release():
+def osci_update():
     args = get_args_or_die(
-        parse_osci_release_args,
-        issues_for_osci_release_args)
+        parse_osci_update_args,
+        issues_for_osci_update_args)
 
     env = OSCIEnv(
         args.osci_repo, args.osci_branch, 'IRRELEVANT', 'IRRELEVANT')
