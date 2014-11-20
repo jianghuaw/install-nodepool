@@ -21,7 +21,7 @@ setup(
     },
     entry_points = {
         'console_scripts': [
-            'inp-install = inp.scripts:install',
+            'inp-nodepool-install = inp.scripts:nodepool_install',
             'inp-upload-keys = inp.scripts:nodepool_upload_keys',
             'inp-nodepool-configure = inp.scripts:nodepool_configure',
             'inp-nodepool-update = inp.scripts:nodepool_update',

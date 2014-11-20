@@ -52,7 +52,7 @@ The following command should not ask for a password:
 
 To install nodepool (but not to start it yet!), you should do the following:
 
-    inp-install --port 2424 ubuntu 127.0.0.1
+    inp-nodepool-install --port 2424 ubuntu 127.0.0.1
 
 After this operation, nodepool is installed to the controller. To understand
 what has happened, take a look at [installscript.sh](inp/installscript.sh).

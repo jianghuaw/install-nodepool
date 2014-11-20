@@ -166,7 +166,7 @@ def get_params_or_die(cloud_parameters_file):
     return bash_env.bash_to_dict(parameter_lines)
 
 
-def install():
+def nodepool_install():
     args = get_args_or_die(parse_install_args, issues_for_install_args)
 
     env = NodepoolInstallEnv(args.nodepool_repo, args.nodepool_branch)
