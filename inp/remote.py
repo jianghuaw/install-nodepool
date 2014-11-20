@@ -19,7 +19,7 @@ def fabric_settings(username, host, port, ignore_failures=False, quiet=False):
     if quiet:
         settings = contextlib.nested(
             settings, context_managers.hide(
-                'running', 'stdout', 'stderr'))
+                'running', 'stdout', 'stderr', 'warnings'))
     return settings
 
 

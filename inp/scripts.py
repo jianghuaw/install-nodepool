@@ -26,6 +26,11 @@ IAD_MAX_DEFAULT = 25
 DFW_MAX_DEFAULT = 10
 ORD_MAX_DEFAULT = 14
 
+ALL_SERVICES_ALIAS = 'all'
+SERVICES = ('citrix-ci', 'citrix-ci-gerritwatch', 'nodepool')
+SERVICE_CHOICES = (ALL_SERVICES_ALIAS,) + SERVICES
+DEFAULT_SERVICE_CHOICE = ALL_SERVICES_ALIAS
+
 
 def bashline(some_dict):
     return ' '.join('{key}={value}'.format(key=key, value=value) for
@@ -327,6 +332,14 @@ def nodepool_configure():
         connection.run('rm -f jenkins.priv')
 
 
+def service_names(alias):
+    if alias == ALL_SERVICES_ALIAS:
+        for service in SERVICES:
+            yield service
+    else:
+        yield alias
+
+
 def _parse_startstop_args(parser):
     parser.add_argument('username', help='Username to target host')
     parser.add_argument('host', help='Target host')
@@ -336,6 +349,11 @@ def _parse_startstop_args(parser):
         default=DEFAULT_PORT,
         help='SSH port to use (default: %s)' % DEFAULT_PORT
     )
+    parser.add_argument(
+        '--service',
+        choices=SERVICE_CHOICES,
+        default=DEFAULT_SERVICE_CHOICE,
+        help='Name of service to operate on (default: %s)' % DEFAULT_SERVICE_CHOICE)
     return parser.parse_args()
 
 
@@ -356,7 +374,15 @@ def ci_status():
 
     with remote.connect(args.username, args.host, args.port) as connection:
         connection.quiet = True
-        print connection.run('initctl list | grep -e citrix -e nodepool')
+        for service in service_names(args.service):
+            result = connection.run(
+                'service %s status' % service,
+                ignore_failures=True
+            )
+            if result.succeeded:
+                print result
+            else:
+                print '%s missing' % service
 
 
 def parse_osci_install_args():
@@ -464,7 +490,7 @@ def osci_release():
 
 
 def parse_osci_start_args():
-    parser = argparse.ArgumentParser(description="Start OSCI")
+    parser = argparse.ArgumentParser(description="Start an OSCI service")
     return _parse_startstop_args(parser)
 
 
@@ -477,7 +503,7 @@ def osci_start():
 
 
 def parse_osci_stop_args():
-    parser = argparse.ArgumentParser(description="Stop OSCI")
+    parser = argparse.ArgumentParser(description="Stop an OSCI service")
     return _parse_startstop_args(parser)
 
 
