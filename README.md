@@ -128,17 +128,26 @@ it with:
 
 Use `--nodepool_repo` and `--nodepool_branch` to specify the target version.
 
-### Start Nodepool
+### Status of the CI
 
-To start the nodepool service on the remote system, use:
+To get a status of the CI, use:
 
-    inp-nodepool-start --port 2424 ubuntu 127.0.0.1
+    inp-osci-status --port 2424 ubuntu 127.0.0.1
+
+Please note, that you can use the `--service` switch to ask for the status of
+an individual service.
+
+### Start Services
+
+Start is similar to status, as it also has the `--service` switch.
+
+    inp-osci-start --port 2424 ubuntu 127.0.0.1
 
 ### Stop Nodepool
 
-To stop the nodepool service on the remote system, use:
+To stop services:
 
-    inp-nodepool-stop --port 2424 ubuntu 127.0.0.1
+    inp-osci-stop --port 2424 ubuntu 127.0.0.1
 
 ## Useful commands
 

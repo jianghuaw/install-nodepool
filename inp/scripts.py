@@ -498,8 +498,8 @@ def osci_start():
     args = get_args_or_die(parse_osci_start_args, system_access_issues)
 
     with remote.connect(args.username, args.host, args.port) as connection:
-        connection.sudo('service citrix-ci start')
-        connection.sudo('service citrix-ci-gerritwatch start')
+        for service in service_names(args.service):
+            connection.sudo('service %s start' % service)
 
 
 def parse_osci_stop_args():
@@ -511,8 +511,8 @@ def osci_stop():
     args = get_args_or_die(parse_osci_stop_args, system_access_issues)
 
     with remote.connect(args.username, args.host, args.port) as connection:
-        connection.sudo('service citrix-ci stop')
-        connection.sudo('service citrix-ci-gerritwatch stop')
+        for service in service_names(args.service):
+            connection.sudo('service %s stop' % service)
 
 
 def _parse_nodepool_upload_keys_args():
