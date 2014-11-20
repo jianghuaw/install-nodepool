@@ -30,7 +30,7 @@ providers:
     project-id: '$OS_PROJECT_ID'
     auth-url: '$OS_AUTH_URL'
     boot-timeout: 60
-    max-servers: 25
+    max-servers: $IAD_MAX
     keypair: $NODEPOOL_KEYPAIR_NAME
     images:
       - name: '$IMAGE_NAME'
@@ -58,7 +58,7 @@ providers:
     project-id: '$OS_PROJECT_ID'
     auth-url: '$OS_AUTH_URL'
     boot-timeout: 60
-    max-servers: 10
+    max-servers: $DFW_MAX
     keypair: $NODEPOOL_KEYPAIR_NAME
     images:
       - name: '$IMAGE_NAME'
@@ -86,7 +86,7 @@ providers:
     project-id: '$OS_PROJECT_ID'
     auth-url: '$OS_AUTH_URL'
     boot-timeout: 60
-    max-servers: 14
+    max-servers: $ORD_MAX
     keypair: $NODEPOOL_KEYPAIR_NAME
     images:
       - name: '$IMAGE_NAME'

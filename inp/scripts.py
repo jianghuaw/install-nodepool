@@ -22,6 +22,11 @@ DEFAULT_KEYPAIR_NAME = 'nodepool'
 NODEPOOL_HOME_DIR = '/home/nodepool'
 
 
+IAD_MAX_DEFAULT = 25
+DFW_MAX_DEFAULT = 10
+ORD_MAX_DEFAULT = 14
+
+
 def bashline(some_dict):
     return ' '.join('{key}={value}'.format(key=key, value=value) for
         key, value in some_dict.iteritems())
@@ -94,13 +99,16 @@ class NodepoolInstallEnv(NodepoolEnv):
 
 class NodepoolConfigEnv(NodepoolEnv):
 
-    def __init__(self, openrc, image_name, min_ready, rackspace_password, key_name):
+    def __init__(self, openrc, image_name, min_ready, rackspace_password, key_name, iad_max=0, ord_max=0, dfw_max=0):
         super(NodepoolConfigEnv, self).__init__()
         self.project_config_url = PROJECT_CONFIG_URL
         self.project_config_branch = PROJECT_CONFIG_BRANCH
         self.openrc = openrc
         self.image_name = image_name
         self.min_ready = str(min_ready)
+        self.iad_max = str(iad_max)
+        self.ord_max = str(ord_max)
+        self.dfw_max = str(dfw_max)
         self.rackspace_password = rackspace_password
         self.key_name = key_name
 
@@ -115,6 +123,9 @@ class NodepoolConfigEnv(NodepoolEnv):
             MIN_READY=self.min_ready,
             RACKSPACE_PASSWORD=self.rackspace_password,
             NODEPOOL_KEYPAIR_NAME=self.key_name,
+            IAD_MAX=self.iad_max,
+            ORD_MAX=self.ord_max,
+            DFW_MAX=self.dfw_max,
             **self.openrc
         )
 
@@ -236,6 +247,24 @@ def _parse_nodepool_configure_args():
         help='Default number of min ready nodes (default: %s)' % DEFAULT_MIN_READY
     )
     parser.add_argument(
+        '--iad_max',
+        type=int,
+        default=IAD_MAX_DEFAULT,
+        help='Maximum number of nodes in IAD (default: %s)' % IAD_MAX_DEFAULT
+    )
+    parser.add_argument(
+        '--dfw_max',
+        type=int,
+        default=DFW_MAX_DEFAULT,
+        help='Maximum number of nodes in DFW (default: %s)' % DFW_MAX_DEFAULT
+    )
+    parser.add_argument(
+        '--ord_max',
+        type=int,
+        default=ORD_MAX_DEFAULT,
+        help='Maximum number of nodes in ORD (default: %s)' % ORD_MAX_DEFAULT
+    )
+    parser.add_argument(
         '--key_name',
         default=DEFAULT_KEYPAIR_NAME,
         help='Keypair name to use (default: %s)' % DEFAULT_KEYPAIR_NAME
@@ -264,6 +293,9 @@ def nodepool_configure():
         args.min_ready,
         args.rackspace_password,
         args.key_name,
+        iad_max=args.iad_max,
+        ord_max=args.ord_max,
+        dfw_max=args.dfw_max
     )
     nodepool_config_file = data.nodepool_config(env.as_dict())
 
