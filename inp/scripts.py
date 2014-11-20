@@ -339,37 +339,9 @@ def _parse_startstop_args(parser):
     return parser.parse_args()
 
 
-def parse_nodepool_start_args():
-    parser = argparse.ArgumentParser(description="Start Nodepool")
-    return _parse_startstop_args(parser)
-
-
 def system_access_issues(args):
     issues = remote_system_access_issues(args.username, args.host, args.port)
     return issues
-
-
-def nodepool_start():
-    args = get_args_or_die(
-        parse_nodepool_start_args,
-        system_access_issues)
-
-    with remote.connect(args.username, args.host, args.port) as connection:
-        connection.sudo('service nodepool start')
-
-
-def parse_nodepool_stop_args():
-    parser = argparse.ArgumentParser(description="Stop Nodepool")
-    return _parse_startstop_args(parser)
-
-
-def nodepool_stop():
-    args = get_args_or_die(
-        parse_nodepool_stop_args,
-        system_access_issues)
-
-    with remote.connect(args.username, args.host, args.port) as connection:
-        connection.sudo('service nodepool stop')
 
 
 def parse_ci_status_args():
