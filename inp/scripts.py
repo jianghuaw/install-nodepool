@@ -53,13 +53,14 @@ def bashline(some_dict):
 
 
 class OSCIEnv(object):
-    def __init__(self, osci_repo, osci_branch, swift_api_key, image_name):
+    def __init__(self, osci_repo, osci_branch, swift_api_key, image_name, vote=False):
         self.username = 'osci'
         self.home = '/home/osci'
         self.osci_repo = osci_repo
         self.osci_branch = osci_branch
         self.swift_api_key = swift_api_key
         self.image_name = image_name
+        self.vote = "YES" if vote else "NO"
 
     @property
     def _env_dict(self):
@@ -71,6 +72,7 @@ class OSCIEnv(object):
             SWIFT_API_KEY=self.swift_api_key,
             NODEPOOL_HOME_DIR=NODEPOOL_HOME_DIR,
             IMAGE_NAME=self.image_name,
+            VOTE=self.vote,
         )
 
     @property
@@ -427,6 +429,12 @@ def parse_osci_install_args():
         default=DEFAULT_PORT,
         help='SSH port to use (default: %s)' % DEFAULT_PORT
     )
+    parser.add_argument(
+        '--vote',
+        action="store_true",
+        default=False,
+        help='Perform voting as well (only enable this on prod environments)'
+    )
     return parser.parse_args()
 
 
@@ -445,7 +453,8 @@ def osci_install():
         issues_for_osci_install_args)
 
     env = OSCIEnv(
-        args.osci_repo, args.osci_branch, args.swift_api_key, args.image_name)
+        args.osci_repo, args.osci_branch, args.swift_api_key, args.image_name,
+        args.vote)
 
     with remote.connect(args.username, args.host, args.port) as connection:
         connection.put(args.gerrit_key, 'gerrit.key')
