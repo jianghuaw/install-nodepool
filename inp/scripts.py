@@ -32,6 +32,21 @@ SERVICE_CHOICES = (ALL_SERVICES_ALIAS,) + SERVICES
 DEFAULT_SERVICE_CHOICE = ALL_SERVICES_ALIAS
 
 
+STATUS_REPORT_QUERY = 'query'
+STATUS_REPORT_ENABLE = 'enable'
+STATUS_REPORT_DISABLE = 'disable'
+
+STATUS_REPORT_CHOICES = (
+    STATUS_REPORT_QUERY,
+    STATUS_REPORT_ENABLE,
+    STATUS_REPORT_DISABLE
+)
+
+STATUS_REPORT_DEFAULT = STATUS_REPORT_QUERY
+
+STATUS_REPORT_DISABLE_FILE = "/etc/osci/skip_status_update"
+
+
 def bashline(some_dict):
     return ' '.join('{key}={value}'.format(key=key, value=value) for
         key, value in some_dict.iteritems())
@@ -340,7 +355,7 @@ def service_names(alias):
         yield alias
 
 
-def _parse_service_mgt_args(parser):
+def _add_system_access_args(parser):
     parser.add_argument('username', help='Username to target host')
     parser.add_argument('host', help='Target host')
     parser.add_argument(
@@ -349,6 +364,9 @@ def _parse_service_mgt_args(parser):
         default=DEFAULT_PORT,
         help='SSH port to use (default: %s)' % DEFAULT_PORT
     )
+
+def _parse_service_mgt_args(parser):
+    _add_system_access_args(parser)
     parser.add_argument(
         '--service',
         choices=SERVICE_CHOICES,
@@ -513,6 +531,35 @@ def osci_stop():
     with remote.connect(args.username, args.host, args.port) as connection:
         for service in service_names(args.service):
             connection.sudo('service %s stop' % service)
+
+
+def parse_osci_status_report_args():
+    parser = argparse.ArgumentParser(description="Control Status Uploads")
+    _add_system_access_args(parser)
+    parser.add_argument(
+        '--action',
+        choices=STATUS_REPORT_CHOICES,
+        default=STATUS_REPORT_DEFAULT,
+        help='Action to perform (default: %s)' % STATUS_REPORT_DEFAULT)
+    return parser.parse_args()
+
+
+def osci_upload_control():
+    args = get_args_or_die(parse_osci_status_report_args, system_access_issues)
+
+    with remote.connect(args.username, args.host, args.port) as connection:
+        connection.quiet = True
+        if args.action == STATUS_REPORT_QUERY:
+            check_status_upload_is_disabled =  connection.run(
+                "test -e %s" % STATUS_REPORT_DISABLE_FILE, ignore_failures=True)
+            if check_status_upload_is_disabled.succeeded:
+                print "DISABLED"
+            else:
+                print "ENABLED"
+        elif args.action == STATUS_REPORT_ENABLE:
+            connection.sudo("rm -f %s" % STATUS_REPORT_DISABLE_FILE)
+        elif args.action == STATUS_REPORT_DISABLE:
+            connection.sudo("touch %s" % STATUS_REPORT_DISABLE_FILE)
 
 
 def _parse_nodepool_upload_keys_args():

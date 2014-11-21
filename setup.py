@@ -32,6 +32,7 @@ setup(
             'inp-osci-backup = inp.scripts:backup',
             'inp-osci-restore = inp.scripts:restore',
             'inp-osci-status = inp.scripts:ci_status',
+            'inp-osci-upload-control = inp.scripts:osci_upload_control',
         ]
     }
 )
