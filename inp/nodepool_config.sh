@@ -4,6 +4,9 @@ set -eux
 THIS_FILE=$(readlink -f $0)
 THIS_DIR=$(dirname $THIS_FILE)
 
+NODEPOOL_XENSERVER_XVA_URL="http://05c1b21d02b2453e74a7-e2f09c34733a73af7a3cee3d72db6e03.r39.cf5.rackcdn.com/images/1.1.4.xva"
+NODEPOOL_XENSERVER_ISO_URL="http://05c1b21d02b2453e74a7-e2f09c34733a73af7a3cee3d72db6e03.r39.cf5.rackcdn.com/images/XenServer-6.2.0-install-cd.iso"
+
 
 ######
 # Clone project-config
@@ -106,6 +109,8 @@ chdir $NODEPOOL_HOME_DIR
 script
     export NODEPOOL_SSH_KEY="\$(cat $NODEPOOL_HOME_DIR/.ssh/jenkins.pub | cut -d' ' -f 2)"
     export NODEPOOL_PYPI_MIRROR="http://pypi.python.org/simple"
+    export NODEPOOL_XENSERVER_XVA_URL=$NODEPOOL_XENSERVER_XVA_URL
+    export NODEPOOL_XENSERVER_ISO_URL=$NODEPOOL_XENSERVER_ISO_URL
     /opt/nodepool/env/bin/python \\
         /opt/nodepool/env/bin/nodepoold \\
         -l /etc/nodepool/logging.conf \\
@@ -135,6 +140,8 @@ sudo tee /usr/local/bin/osci-nodepool << EOF
 sudo -u $NODEPOOL_USER -i \\
     NODEPOOL_SSH_KEY="\$(cat $NODEPOOL_HOME_DIR/.ssh/jenkins.pub | cut -d' ' -f 2)" \\
     NODEPOOL_PYPI_MIRROR="http://pypi.python.org/simple" \\
+    NODEPOOL_XENSERVER_XVA_URL=$NODEPOOL_XENSERVER_XVA_URL \\
+    NODEPOOL_XENSERVER_ISO_URL=$NODEPOOL_XENSERVER_ISO_URL \\
     /opt/nodepool/env/bin/nodepool "\$@"
 EOF
 
