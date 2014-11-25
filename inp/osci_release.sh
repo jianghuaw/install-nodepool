@@ -46,7 +46,7 @@ sudo ln -s -t /usr/local/bin /opt/osci/env/bin/osci-view
 rm -f /usr/local/bin/osci-manage
 sudo tee /usr/local/bin/osci-manage << EOF
 #!/bin/bash
-sudo -u $OSCI_USER -i /opt/osci/env/bin/osci-manage "$@"
+sudo -u $OSCI_USER -i /opt/osci/env/bin/osci-manage "\$@"
 EOF
 sudo chmod 0755 /usr/local/bin/osci-manage
 
