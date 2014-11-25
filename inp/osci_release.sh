@@ -34,6 +34,15 @@ pip install -U requests==2.2.0
 EOF
 
 
+rm -f /usr/local/bin/osci-view
+rm -f /usr/local/bin/osci-manage
+
+######
+# Create a link for osci- utils
+sudo ln -s -t /usr/local/bin /opt/osci/env/bin/osci-view
+sudo ln -s -t /usr/local/bin /opt/osci/env/bin/osci-manage
+
+
 ######
 # Set rights
 sudo chmod -R g-w,o-w /etc/osci /opt/osci

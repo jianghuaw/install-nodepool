@@ -165,6 +165,7 @@ sudo -u osci -i /bin/bash -c "ssh-keyscan -H -t rsa -p $GERRIT_PORT '$GERRIT_HOS
 ######
 # Create a link for osci-view
 sudo ln -s -t /usr/local/bin /opt/osci/env/bin/osci-view
+sudo ln -s -t /usr/local/bin /opt/osci/env/bin/osci-manage
 
 ######
 # Skip uploading status for now
