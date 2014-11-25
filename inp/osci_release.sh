@@ -34,13 +34,21 @@ pip install -U requests==2.2.0
 EOF
 
 
-rm -f /usr/local/bin/osci-view
-rm -f /usr/local/bin/osci-manage
 
 ######
-# Create a link for osci- utils
+# Create a link for osci-view
+rm -f /usr/local/bin/osci-view
 sudo ln -s -t /usr/local/bin /opt/osci/env/bin/osci-view
-sudo ln -s -t /usr/local/bin /opt/osci/env/bin/osci-manage
+
+
+######
+# Create osci-manage
+rm -f /usr/local/bin/osci-manage
+sudo tee /usr/local/bin/osci-manage << EOF
+#!/bin/bash
+sudo -u $OSCI_USER -i /opt/osci/env/bin/osci-manage "$@"
+EOF
+sudo chmod 0755 /usr/local/bin/osci-manage
 
 
 ######
