@@ -476,6 +476,10 @@ def osci_install():
     with remote.connect(args.username, args.host, args.port) as connection:
         connection.put(args.gerrit_key, 'gerrit.key')
         connection.put(
+            data.install_script('osci_rewrite_config.sh'),
+            'osci_rewrite_config.sh'
+        )
+        connection.put(
             data.install_script('osci_installscript.sh'),
             'osci_installscript.sh'
         )
@@ -483,7 +487,7 @@ def osci_install():
             '%s bash osci_installscript.sh' % env.bashline
         )
         connection.run(
-            'rm -f gerrit.key osci_installscript.sh')
+            'rm -f gerrit.key osci_installscript.sh osci_rewrite_config.sh')
 
 
 def parse_osci_update_args():
@@ -522,10 +526,6 @@ def osci_update():
         args.osci_repo, args.osci_branch, 'IRRELEVANT', 'IRRELEVANT')
 
     with remote.connect(args.username, args.host, args.port) as connection:
-        connection.put(
-            data.install_script('osci_rewrite_config.sh'),
-            'osci_rewrite_config.sh'
-        )
         connection.put(
             data.install_script('osci_release.sh'),
             'osci_release.sh'
