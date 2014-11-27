@@ -772,3 +772,29 @@ def restore():
         connection.put(args.dump_file, 'osci-backup.tgz')
         connection.run('bash restore.sh')
         connection.run('rm -f restore.sh osci-backup.tgz')
+
+
+def issues_for_osci_rewrite_args(args):
+    return remote_system_access_issues(args.username, args.host, args.port)
+
+
+def parse_osci_rewrite_args():
+    parser = argparse.ArgumentParser(description="Rewrite OSCI config file")
+    _add_system_access_args(parser)
+    _add_osci_config_args(parser)
+    return parser.parse_args()
+
+
+def osci_rewrite_config():
+    args = get_args_or_die(
+        parse_osci_rewrite_args,
+        issues_for_osci_rewrite_args
+    )
+
+    with remote.connect(args.username, args.host, args.port) as connection:
+        connection.put(
+            data.install_script('osci_rewrite_config.sh'),
+            'osci_rewrite_config.sh'
+        )
+        connection.run('bash osci_rewrite_config.sh')
+        connection.run('rm -f osci_rewrite_config.sh')
