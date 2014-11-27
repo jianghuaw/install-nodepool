@@ -21,7 +21,7 @@ sudo git clone --quiet \
 test -d /opt/nodepool/project-config/nodepool/scripts
 
 
-sudo cp $THIS_DIR/nodepool.yaml /etc/nodepool/nodepool.yaml
+source $THIS_DIR/nodepool_rewrite_config.sh
 
 
 ######

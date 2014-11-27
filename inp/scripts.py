@@ -336,6 +336,10 @@ def nodepool_configure():
 
     with remote.connect(args.username, args.host, args.port) as connection:
         connection.put(
+            data.install_script('nodepool_rewrite_config.sh'),
+            'nodepool_rewrite_config.sh'
+        )
+        connection.put(
             data.install_script('nodepool_config.sh'),
             'nodepool_config.sh'
         )
@@ -360,6 +364,7 @@ def nodepool_configure():
         connection.run('rm -f nodepool.yaml')
         connection.run('rm -f nodepool.priv')
         connection.run('rm -f jenkins.priv')
+        connection.run('rm -f nodepool_rewrite_config.sh')
 
 
 def service_names(alias):
