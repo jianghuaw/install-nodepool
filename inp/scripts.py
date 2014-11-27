@@ -418,14 +418,24 @@ def ci_status():
                 print '%s missing' % service
 
 
+def _add_osci_config_args(parser):
+    parser.add_argument('swift_api_key', help='Swift API key')
+    parser.add_argument('image_name', help='Image to be used')
+    parser.add_argument(
+        '--vote',
+        action="store_true",
+        default=False,
+        help='Perform voting as well (only enable this on prod environments)'
+    )
+
+
 def parse_osci_install_args():
     parser = argparse.ArgumentParser(description="Install OSCI")
     parser.add_argument('gerrit_key', help='Private key file to be used'
                         ' with gerrit')
     parser.add_argument('username', help='Username to target host')
     parser.add_argument('host', help='Target host')
-    parser.add_argument('swift_api_key', help='Swift API key')
-    parser.add_argument('image_name', help='Image to be used')
+    _add_osci_config_args(parser)
     parser.add_argument(
         '--osci_repo',
         default=DEFAULT_OSCI_REPO,
@@ -441,12 +451,6 @@ def parse_osci_install_args():
         type=int,
         default=DEFAULT_PORT,
         help='SSH port to use (default: %s)' % DEFAULT_PORT
-    )
-    parser.add_argument(
-        '--vote',
-        action="store_true",
-        default=False,
-        help='Perform voting as well (only enable this on prod environments)'
     )
     return parser.parse_args()
 
