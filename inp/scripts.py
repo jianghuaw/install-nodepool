@@ -857,7 +857,7 @@ def nodepool_rewrite_config():
     )
 
     env = NodepoolConfigEnv(
-        args.openrc,
+        get_params_or_die(args.openrc),
         args.image_name,
         args.min_ready,
         args.rackspace_password,
