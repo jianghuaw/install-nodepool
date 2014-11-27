@@ -263,40 +263,9 @@ def _parse_nodepool_configure_args():
     parser = argparse.ArgumentParser(
         description="Configure Nodepool on a remote machine")
     _add_system_access_args(parser)
-    parser.add_argument('openrc', help='OpenRc file to access the cloud')
-    parser.add_argument('image_name', help='Image name to be used')
+    _add_nodepool_config_args(parser)
     parser.add_argument('nodepool_keyfile', help='SSH key to be used to prepare nodes')
     parser.add_argument('jenkins_keyfile', help='SSH key to be used by jenkins')
-    parser.add_argument('rackspace_password', help='Rackspace password')
-    parser.add_argument(
-        '--min_ready',
-        type=int,
-        default=DEFAULT_MIN_READY,
-        help='Default number of min ready nodes (default: %s)' % DEFAULT_MIN_READY
-    )
-    parser.add_argument(
-        '--iad_max',
-        type=int,
-        default=IAD_MAX_DEFAULT,
-        help='Maximum number of nodes in IAD (default: %s)' % IAD_MAX_DEFAULT
-    )
-    parser.add_argument(
-        '--dfw_max',
-        type=int,
-        default=DFW_MAX_DEFAULT,
-        help='Maximum number of nodes in DFW (default: %s)' % DFW_MAX_DEFAULT
-    )
-    parser.add_argument(
-        '--ord_max',
-        type=int,
-        default=ORD_MAX_DEFAULT,
-        help='Maximum number of nodes in ORD (default: %s)' % ORD_MAX_DEFAULT
-    )
-    parser.add_argument(
-        '--key_name',
-        default=DEFAULT_KEYPAIR_NAME,
-        help='Keypair name to use (default: %s)' % DEFAULT_KEYPAIR_NAME
-    )
     return parser.parse_args()
 
 
@@ -815,6 +784,11 @@ def parse_nodepool_rewrite_config_args():
     parser = argparse.ArgumentParser(
         description="Rewrite nodepool configuration file on a remote machine")
     _add_system_access_args(parser)
+    _add_nodepool_config_args(parser)
+    return parser.parse_args()
+
+
+def _add_nodepool_config_args(parser):
     parser.add_argument('openrc', help='OpenRc file to access the cloud')
     parser.add_argument('image_name', help='Image name to be used')
     parser.add_argument('rackspace_password', help='Rackspace password')
@@ -847,7 +821,6 @@ def parse_nodepool_rewrite_config_args():
         default=DEFAULT_KEYPAIR_NAME,
         help='Keypair name to use (default: %s)' % DEFAULT_KEYPAIR_NAME
     )
-    return parser.parse_args()
 
 
 def nodepool_rewrite_config():
