@@ -37,6 +37,7 @@ setup(
             'inp-osci-status = inp.scripts:ci_status',
             'inp-osci-upload-control = inp.scripts:osci_upload_control',
             'inp-osci-rewrite-config = inp.scripts:osci_rewrite_config',
+            'inp-nodepool-rewrite-config = inp.scripts:nodepool_rewrite_config',
         ]
     }
 )

@@ -262,19 +262,12 @@ def image_provider_regions():
 def _parse_nodepool_configure_args():
     parser = argparse.ArgumentParser(
         description="Configure Nodepool on a remote machine")
-    parser.add_argument('username', help='Username to target host')
-    parser.add_argument('host', help='Target host')
+    _add_system_access_args(parser)
     parser.add_argument('openrc', help='OpenRc file to access the cloud')
     parser.add_argument('image_name', help='Image name to be used')
     parser.add_argument('nodepool_keyfile', help='SSH key to be used to prepare nodes')
     parser.add_argument('jenkins_keyfile', help='SSH key to be used by jenkins')
     parser.add_argument('rackspace_password', help='Rackspace password')
-    parser.add_argument(
-        '--port',
-        type=int,
-        default=DEFAULT_PORT,
-        help='SSH port to use (default: %s)' % DEFAULT_PORT
-    )
     parser.add_argument(
         '--min_ready',
         type=int,
@@ -809,3 +802,81 @@ def osci_rewrite_config():
         )
         connection.run('%s bash osci_rewrite_config.sh' % env.bashline)
         connection.run('rm -f osci_rewrite_config.sh')
+
+
+def issues_for_nodepool_rewrite_config(args):
+    return (
+        remote_system_access_issues(args.username, args.host, args.port)
+        + file_access_issues(args.openrc)
+    )
+
+
+def parse_nodepool_rewrite_config_args():
+    parser = argparse.ArgumentParser(
+        description="Rewrite nodepool configuration file on a remote machine")
+    _add_system_access_args(parser)
+    parser.add_argument('openrc', help='OpenRc file to access the cloud')
+    parser.add_argument('image_name', help='Image name to be used')
+    parser.add_argument('rackspace_password', help='Rackspace password')
+    parser.add_argument(
+        '--min_ready',
+        type=int,
+        default=DEFAULT_MIN_READY,
+        help='Default number of min ready nodes (default: %s)' % DEFAULT_MIN_READY
+    )
+    parser.add_argument(
+        '--iad_max',
+        type=int,
+        default=IAD_MAX_DEFAULT,
+        help='Maximum number of nodes in IAD (default: %s)' % IAD_MAX_DEFAULT
+    )
+    parser.add_argument(
+        '--dfw_max',
+        type=int,
+        default=DFW_MAX_DEFAULT,
+        help='Maximum number of nodes in DFW (default: %s)' % DFW_MAX_DEFAULT
+    )
+    parser.add_argument(
+        '--ord_max',
+        type=int,
+        default=ORD_MAX_DEFAULT,
+        help='Maximum number of nodes in ORD (default: %s)' % ORD_MAX_DEFAULT
+    )
+    parser.add_argument(
+        '--key_name',
+        default=DEFAULT_KEYPAIR_NAME,
+        help='Keypair name to use (default: %s)' % DEFAULT_KEYPAIR_NAME
+    )
+    return parser.parse_args()
+
+
+def nodepool_rewrite_config():
+    args = get_args_or_die(
+        parse_nodepool_rewrite_config_args,
+        issues_for_nodepool_rewrite_config
+    )
+
+    env = NodepoolConfigEnv(
+        args.openrc,
+        args.image_name,
+        args.min_ready,
+        args.rackspace_password,
+        args.key_name,
+        iad_max=args.iad_max,
+        ord_max=args.ord_max,
+        dfw_max=args.dfw_max
+    )
+    nodepool_config_file = data.nodepool_config(env.as_dict())
+
+    with remote.connect(args.username, args.host, args.port) as connection:
+        connection.put(
+            data.install_script('nodepool_rewrite_config.sh'),
+            'nodepool_rewrite_config.sh'
+        )
+        connection.put(
+            nodepool_config_file,
+            'nodepool.yaml'
+        )
+
+        connection.run('bash nodepool_rewrite_config.sh')
+        connection.run('rm -f nodepool_rewrite_config.sh')
