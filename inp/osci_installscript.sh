@@ -129,9 +129,6 @@ sudo cp $THIS_DIR/gerrit.key $OSCI_HOME_DIR/.ssh/id_rsa
 sudo chown -R $OSCI_USER:$OSCI_USER $OSCI_HOME_DIR/.ssh
 sudo chmod -R g-w,g-r,o-w,o-r $OSCI_HOME_DIR/.ssh
 
-GERRIT_HOST=23.253.232.87
-GERRIT_PORT=29418
-
 source $THIS_DIR/osci_rewrite_config.sh
 
 ######

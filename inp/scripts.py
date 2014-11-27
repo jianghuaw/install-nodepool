@@ -73,6 +73,8 @@ class OSCIEnv(object):
             NODEPOOL_HOME_DIR=NODEPOOL_HOME_DIR,
             IMAGE_NAME=self.image_name,
             VOTE=self.vote,
+            GERRIT_HOST="23.253.232.87",
+            GERRIT_PORT="29418",
         )
 
     @property
