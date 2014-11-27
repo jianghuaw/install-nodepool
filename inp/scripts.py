@@ -52,12 +52,10 @@ def bashline(some_dict):
         key, value in some_dict.iteritems())
 
 
-class OSCIEnv(object):
-    def __init__(self, osci_repo, osci_branch, swift_api_key, image_name, vote=False):
+class OSCIConfigEnv(object):
+    def __init__(self, swift_api_key, image_name, vote):
         self.username = 'osci'
         self.home = '/home/osci'
-        self.osci_repo = osci_repo
-        self.osci_branch = osci_branch
         self.swift_api_key = swift_api_key
         self.image_name = image_name
         self.vote = "YES" if vote else "NO"
@@ -67,8 +65,6 @@ class OSCIEnv(object):
         return dict(
             OSCI_USER=self.username,
             OSCI_HOME_DIR=self.home,
-            OSCI_REPO=self.osci_repo,
-            OSCI_BRANCH=self.osci_branch,
             SWIFT_API_KEY=self.swift_api_key,
             NODEPOOL_HOME_DIR=NODEPOOL_HOME_DIR,
             IMAGE_NAME=self.image_name,
@@ -83,6 +79,21 @@ class OSCIEnv(object):
 
     def as_dict(self):
         return self._env_dict
+
+
+class OSCIInstallEnv(OSCIConfigEnv):
+    def __init__(self, osci_repo, osci_branch, swift_api_key, image_name, vote=False):
+        super(OSCIInstallEnv, self).__init__(swift_api_key, image_name, vote)
+        self.osci_repo = osci_repo
+        self.osci_branch = osci_branch
+
+    @property
+    def _env_dict(self):
+        return dict(
+            super(OSCIInstallEnv, self)._env_dict,
+            OSCI_REPO=self.osci_repo,
+            OSCI_BRANCH=self.osci_branch,
+        )
 
 
 class NodepoolEnv(object):
@@ -454,7 +465,7 @@ def osci_install():
         parse_osci_install_args,
         issues_for_osci_install_args)
 
-    env = OSCIEnv(
+    env = OSCIInstallEnv(
         args.osci_repo, args.osci_branch, args.swift_api_key, args.image_name,
         args.vote)
 
@@ -503,7 +514,7 @@ def osci_update():
         parse_osci_update_args,
         issues_for_osci_update_args)
 
-    env = OSCIEnv(
+    env = OSCIInstallEnv(
         args.osci_repo, args.osci_branch, 'IRRELEVANT', 'IRRELEVANT')
 
     with remote.connect(args.username, args.host, args.port) as connection:
