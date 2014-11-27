@@ -791,10 +791,16 @@ def osci_rewrite_config():
         issues_for_osci_rewrite_args
     )
 
+    env = OSCIConfigEnv(
+        args.swift_api_key,
+        args.image_name,
+        args.vote
+    )
+
     with remote.connect(args.username, args.host, args.port) as connection:
         connection.put(
             data.install_script('osci_rewrite_config.sh'),
             'osci_rewrite_config.sh'
         )
-        connection.run('bash osci_rewrite_config.sh')
+        connection.run('%s bash osci_rewrite_config.sh' % env.bashline)
         connection.run('rm -f osci_rewrite_config.sh')
