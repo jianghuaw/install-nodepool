@@ -17,7 +17,8 @@ setup(
             'nodepool.yaml',
             'osci.config',
             'backup.sh',
-            'restore.sh'],
+            'restore.sh',
+            'osci_rewrite_config.sh'],
     },
     entry_points = {
         'console_scripts': [

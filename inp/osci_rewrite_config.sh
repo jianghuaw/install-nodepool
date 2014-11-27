@@ -1,0 +1,27 @@
+set -eux
+
+VOTE_VALUE="False"
+VOTE_PASSED_ONLY_VALUE="True"
+VOTE_SERVICE_ACCOUNT_VALUE="False"
+
+if [ "$VOTE" = "YES" ]; then
+    VOTE_VALUE="True"
+    VOTE_PASSED_ONLY_VALUE="False"
+    VOTE_SERVICE_ACCOUNT_VALUE="True"
+fi
+
+sudo tee /etc/osci/osci.config << OSCI_CONF_END
+RUN_TESTS=True
+VOTE=$VOTE_VALUE
+VOTE_PASSED_ONLY=$VOTE_PASSED_ONLY_VALUE
+VOTE_SERVICE_ACCOUNT=$VOTE_SERVICE_ACCOUNT_VALUE
+MYSQL_USERNAME=nodepool
+GERRIT_HOST=$GERRIT_HOST
+GERRIT_PORT=$GERRIT_PORT
+RECHECK_REGEXP=.*(citrix recheck|xenserver:? recheck|recheck xenserver).*
+KEEP_FAILED=0
+PROJECT_CONFIG=openstack/nova,openstack/tempest,openstack-dev/devstack,stackforge/xenapi-os-testing
+NODE_KEY=$OSCI_HOME_DIR/.ssh/jenkins
+SWIFT_API_KEY=$SWIFT_API_KEY
+NODEPOOL_IMAGE=$IMAGE_NAME
+OSCI_CONF_END

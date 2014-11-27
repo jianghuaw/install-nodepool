@@ -506,6 +506,10 @@ def osci_update():
 
     with remote.connect(args.username, args.host, args.port) as connection:
         connection.put(
+            data.install_script('osci_rewrite_config.sh'),
+            'osci_rewrite_config.sh'
+        )
+        connection.put(
             data.install_script('osci_release.sh'),
             'osci_release.sh'
         )
