@@ -853,3 +853,4 @@ def nodepool_rewrite_config():
 
         connection.run('bash nodepool_rewrite_config.sh')
         connection.run('rm -f nodepool_rewrite_config.sh')
+        connection.run('rm -f nodepool.yaml')
