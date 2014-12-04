@@ -16,3 +16,10 @@ function get_osci_sources() {
     git checkout $OSCI_BRANCH
     popd
 }
+
+
+function get_project_config() {
+    sudo git clone --quiet \
+        --branch $PROJECT_CONFIG_BRANCH \
+        $PROJECT_CONFIG_URL /opt/nodepool/project-config
+}

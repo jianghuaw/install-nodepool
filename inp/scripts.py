@@ -307,6 +307,10 @@ def nodepool_configure():
             'nodepool_config.sh'
         )
         connection.put(
+            data.install_script('functions.sh'),
+            'functions.sh'
+        )
+        connection.put(
             nodepool_config_file,
             'nodepool.yaml'
         )
@@ -327,6 +331,7 @@ def nodepool_configure():
         connection.run('rm -f nodepool.yaml')
         connection.run('rm -f nodepool.priv')
         connection.run('rm -f jenkins.priv')
+        connection.run('rm -f functions.sh')
         connection.run('rm -f nodepool_rewrite_config.sh')
 
 
