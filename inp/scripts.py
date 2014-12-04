@@ -208,8 +208,9 @@ def nodepool_install():
 
     with remote.connect(args.username, args.host, args.port) as connection:
         connection.put(data.install_script('installscript.sh'), 'install.sh')
+        connection.put(data.install_script('functions.sh'), 'functions.sh')
         connection.run('%s bash install.sh' % env.bashline)
-        connection.run('rm -f install.sh')
+        connection.run('rm -f install.sh functions.sh')
 
 
 class NovaCommands(object):
@@ -678,8 +679,9 @@ def nodepool_update():
 
     with remote.connect(args.username, args.host, args.port) as connection:
         connection.put(data.install_script('update.sh'), 'update.sh')
+        connection.put(data.install_script('functions.sh'), 'functions.sh')
         connection.run('%s bash update.sh' % env.bashline)
-        connection.run('rm -f update.sh')
+        connection.run('rm -f update.sh functions.sh')
 
 
 def parse_backup_args():

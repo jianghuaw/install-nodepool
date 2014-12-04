@@ -1,5 +1,10 @@
 set -eux
 
+THIS_FILE=$(readlink -f $0)
+THIS_DIR=$(dirname $THIS_FILE)
+
+. $THIS_DIR/functions.sh
+
 ######
 # Make sure nodepool is stopped
 service nodepool status | grep -q "stop/waiting"
@@ -18,10 +23,7 @@ sudo rm -rf /opt/nodepool/{env,src}
 ######
 # Check out sources
 sudo mkdir /opt/nodepool/src
-sudo git clone \
-    --quiet \
-    $NODEPOOL_REPO --branch $NODEPOOL_BRANCH \
-    /opt/nodepool/src
+get_nodepool_sources
 
 
 ######

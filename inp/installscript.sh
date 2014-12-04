@@ -1,5 +1,10 @@
 set -eux
 
+THIS_FILE=$(readlink -f $0)
+THIS_DIR=$(dirname $THIS_FILE)
+
+. $THIS_DIR/functions.sh
+
 ######
 # Install system level dependencies
 sudo apt-get -qy update
@@ -42,10 +47,7 @@ sudo mkdir /var/log/nodepool
 ######
 # Check out sources
 sudo mkdir /opt/nodepool/src
-sudo git clone \
-    --quiet \
-    $NODEPOOL_REPO --branch $NODEPOOL_BRANCH \
-    /opt/nodepool/src
+get_nodepool_sources
 
 
 ######
