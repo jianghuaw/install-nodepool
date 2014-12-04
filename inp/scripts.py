@@ -267,6 +267,11 @@ def _parse_nodepool_configure_args():
     _add_nodepool_config_args(parser)
     parser.add_argument('nodepool_keyfile', help='SSH key to be used to prepare nodes')
     parser.add_argument('jenkins_keyfile', help='SSH key to be used by jenkins')
+    parser.add_argument(
+        '--project_config_branch',
+        default=PROJECT_CONFIG_BRANCH,
+        help='Branch of project-config to use (default: %s)' % PROJECT_CONFIG_BRANCH
+    )
     return parser.parse_args()
 
 
@@ -295,6 +300,7 @@ def nodepool_configure():
         ord_max=args.ord_max,
         dfw_max=args.dfw_max
     )
+    env.project_config_branch = args.project_config_branch
     nodepool_config_file = data.nodepool_config(env.as_dict())
 
     with remote.connect(args.username, args.host, args.port) as connection:
