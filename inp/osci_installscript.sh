@@ -3,6 +3,7 @@ set -eux
 THIS_FILE=$(readlink -f $0)
 THIS_DIR=$(dirname $THIS_FILE)
 
+. $THIS_DIR/functions.sh
 
 ######
 # Create an osci user
@@ -37,11 +38,7 @@ sudo mkdir /var/log/osci
 ######
 # Check out sources
 sudo mkdir /opt/osci/src
-sudo git clone \
-    --quiet \
-    $OSCI_REPO --branch $OSCI_BRANCH \
-    /opt/osci/src
-
+get_osci_sources
 
 ######
 # Create database

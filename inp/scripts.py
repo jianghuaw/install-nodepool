@@ -451,11 +451,16 @@ def osci_install():
             data.install_script('osci_installscript.sh'),
             'osci_installscript.sh'
         )
+        connection.put(
+            data.install_script('functions.sh'),
+            'functions.sh'
+        )
         connection.run(
             '%s bash osci_installscript.sh' % env.bashline
         )
         connection.run(
-            'rm -f gerrit.key osci_installscript.sh osci_rewrite_config.sh')
+            'rm -f gerrit.key osci_installscript.sh osci_rewrite_config.sh'
+            ' functions.sh')
 
 
 def parse_osci_update_args():
@@ -498,11 +503,15 @@ def osci_update():
             data.install_script('osci_release.sh'),
             'osci_release.sh'
         )
+        connection.put(
+            data.install_script('functions.sh'),
+            'functions.sh'
+        )
         connection.run(
             '%s bash osci_release.sh' % env.bashline
         )
         connection.run(
-            'rm -f gerrit.key osci_release.sh')
+            'rm -f gerrit.key osci_release.sh functions.sh')
 
 
 def parse_osci_start_args():

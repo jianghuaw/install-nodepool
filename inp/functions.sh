@@ -6,3 +6,11 @@ function get_nodepool_sources() {
     git checkout $NODEPOOL_BRANCH
     popd
 }
+
+
+function get_osci_sources() {
+    sudo git clone \
+        --quiet \
+        $OSCI_REPO --branch $OSCI_BRANCH \
+        /opt/osci/src
+}
