@@ -20,6 +20,7 @@ setup(
             'restore.sh',
             'osci_rewrite_config.sh',
             'nodepool_rewrite_config.sh',
+            'functions.sh',
         ],
     },
     entry_points = {
