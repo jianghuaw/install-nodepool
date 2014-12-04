@@ -20,6 +20,8 @@ function get_osci_sources() {
 
 function get_project_config() {
     sudo git clone --quiet \
-        --branch $PROJECT_CONFIG_BRANCH \
         $PROJECT_CONFIG_URL /opt/nodepool/project-config
+    pushd /opt/nodepool/project-config
+    git checkout $PROJECT_CONFIG_BRANCH
+    popd
 }
