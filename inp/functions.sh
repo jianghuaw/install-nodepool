@@ -11,6 +11,8 @@ function get_nodepool_sources() {
 function get_osci_sources() {
     sudo git clone \
         --quiet \
-        $OSCI_REPO --branch $OSCI_BRANCH \
-        /opt/osci/src
+        $OSCI_REPO /opt/osci/src
+    pushd /opt/osci/src
+    git checkout $OSCI_BRANCH
+    popd
 }
