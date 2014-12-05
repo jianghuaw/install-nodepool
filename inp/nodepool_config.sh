@@ -6,7 +6,7 @@ THIS_DIR=$(dirname $THIS_FILE)
 
 . $THIS_DIR/functions.sh
 
-NODEPOOL_XENSERVER_XVA_URL="http://05c1b21d02b2453e74a7-e2f09c34733a73af7a3cee3d72db6e03.r39.cf5.rackcdn.com/images/1.1.4.xva"
+NODEPOOL_XENSERVER_XVA_URL="http://downloads.vmd.citrix.com/OpenStack/xenapi-in-the-cloud-appliances/prod_ci"
 NODEPOOL_XENSERVER_ISO_URL="http://05c1b21d02b2453e74a7-e2f09c34733a73af7a3cee3d72db6e03.r39.cf5.rackcdn.com/images/XenServer-6.2.0-install-cd.iso"
 
 
