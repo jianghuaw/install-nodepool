@@ -16,7 +16,7 @@ sudo DEBIAN_FRONTEND=noninteractive apt-get install -qy \
 
 ######
 # Create a nodepool user
-sudo adduser \
+getent passwd $NODEPOOL_USER || sudo adduser \
     --home $NODEPOOL_HOME_DIR \
     --disabled-password \
     --quiet \
@@ -26,32 +26,33 @@ sudo adduser \
 
 ######
 # Create install directory
-sudo mkdir /opt/nodepool
+sudo mkdir -p /opt/nodepool
 
 
 ######
 # Create config directory
-sudo mkdir /etc/nodepool
+sudo mkdir -p /etc/nodepool
 
 
 ######
 # Create pid directory
-sudo mkdir /var/run/nodepool
+sudo mkdir -p /var/run/nodepool
 
 
 ######
 # Create log directory
-sudo mkdir /var/log/nodepool
+sudo mkdir -p /var/log/nodepool
 
 
 ######
 # Check out sources
-sudo mkdir /opt/nodepool/src
+sudo mkdir -p /opt/nodepool/src
 get_nodepool_sources
 
 
 ######
 # Install binaries
+[ -e /opt/nodepool/env ] && rm -rf /opt/nodepool/env
 sudo virtualenv /opt/nodepool/env
 sudo bash << EOF
 set -ex
@@ -59,6 +60,7 @@ set -ex
 set -u
 cd /opt/nodepool/src
 pip install -U distribute
+pip install -U version
 pip install -U -r requirements.txt
 pip install .
 pip install python-novaclient rackspace-auth-openstack
@@ -68,7 +70,7 @@ EOF
 ######
 # Create database
 mysql -u root << DBINIT
-create database nodepool;
+create database if not exist nodepool;
 GRANT ALL ON nodepool.* TO 'nodepool'@'localhost';
 flush privileges;
 DBINIT
